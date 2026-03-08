@@ -39,7 +39,7 @@ const Landing = () => {
             </p>
             <div className="flex flex-col sm:flex-row gap-3">
               <Link to="/listings"><Button size="lg" className="text-base px-8 gap-2"><Search className="w-5 h-5" />Browse Houses</Button></Link>
-              <Link to="/map"><Button size="lg" variant="outline" className="text-base px-8 gap-2 border-primary-foreground/20 hover:bg-primary-foreground/10" style={{ color: "hsl(0 0% 100%)" }}><MapPin className="w-5 h-5" />View on Map</Button></Link>
+              <Link to="/map"><Button size="lg" variant="outline" className="text-base px-8 gap-2 border-white/30 bg-white/10 text-white hover:bg-white/20 hover:text-white"><MapPin className="w-5 h-5" />View on Map</Button></Link>
             </div>
             <div className="flex gap-8 mt-12">
               {[{ label: "Properties", value: "1,200+" }, { label: "Cities", value: "25+" }, { label: "Happy Tenants", value: "5,000+" }].map((stat) => (
