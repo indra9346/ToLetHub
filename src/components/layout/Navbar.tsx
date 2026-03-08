@@ -41,10 +41,10 @@ const Navbar = () => {
                 </Link>
               );
             })}
-            {isAdmin && (
+            {user && (
               <Link to="/admin">
                 <Button variant={location.pathname === "/admin" ? "default" : "ghost"} size="sm" className={location.pathname === "/admin" ? "" : "text-muted-foreground hover:text-foreground"}>
-                  <LayoutDashboard className="w-4 h-4 mr-1.5" />Dashboard
+                  <LayoutDashboard className="w-4 h-4 mr-1.5" />{isAdmin ? "Dashboard" : "List House"}
                 </Button>
               </Link>
             )}
