@@ -118,7 +118,11 @@ const MapPage = () => {
             <div>
               <h1 className="font-display text-3xl font-bold text-foreground mb-1">Live Map</h1>
               <p className="text-muted-foreground text-sm">
-                {geo.isTracking ? (
+                {isLoading ? (
+                  <span className="flex items-center gap-1">
+                    <Loader2 className="w-3 h-3 animate-spin" /> Loading houses...
+                  </span>
+                ) : geo.isTracking ? (
                   <span className="flex items-center gap-1">
                     <span className="w-2 h-2 rounded-full bg-success animate-pulse" />
                     Live tracking · {nearbyHouses.length} houses nearby
