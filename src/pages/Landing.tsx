@@ -101,7 +101,11 @@ const Landing = () => {
             <h2 className="font-display text-3xl sm:text-4xl font-bold mb-4" style={{ color: "hsl(0 0% 100%)" }}>Ready to Find Your Home?</h2>
             <p className="text-lg mb-8 max-w-xl mx-auto" style={{ color: "hsl(220 10% 75%)" }}>Join thousands of tenants who found their perfect rental through ToLetHub.</p>
             <div className="flex justify-center gap-3">
-              <Link to="/auth?mode=signup"><Button size="lg" className="text-base px-8">Create Free Account</Button></Link>
+              {user ? (
+                <Link to="/listings"><Button size="lg" className="text-base px-8">Browse Houses</Button></Link>
+              ) : (
+                <Link to="/auth?mode=signup"><Button size="lg" className="text-base px-8">Create Free Account</Button></Link>
+              )}
               <Link to="/listings"><Button size="lg" variant="outline" className="text-base px-8 border-white/30 bg-white/10 text-white hover:bg-white/20 hover:text-white">Browse Listings</Button></Link>
             </div>
           </motion.div>
