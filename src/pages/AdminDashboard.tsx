@@ -272,12 +272,11 @@ const AdminDashboard = () => {
                       <Input type="email" value={form.contact_email} onChange={(e) => setForm({ ...form, contact_email: e.target.value })} />
                     </div>
                   </div>
-                  {!editingId && (
-                    <div>
-                      <label className="text-sm font-medium text-foreground mb-1 block">House Images</label>
-                      <Input type="file" accept="image/*" multiple onChange={(e) => setImageFiles(Array.from(e.target.files || []))} />
-                    </div>
-                  )}
+                  <div>
+                    <label className="text-sm font-medium text-foreground mb-1 block">House Images (Bedroom, Kitchen, Hall, etc.)</label>
+                    <Input type="file" accept="image/*" multiple onChange={(e) => setImageFiles(Array.from(e.target.files || []))} />
+                    <p className="text-xs text-muted-foreground mt-1">Upload multiple photos — bedrooms, kitchen, hall, bathrooms, exterior</p>
+                  </div>
                   <Button type="submit" className="w-full" disabled={createHouse.isPending || updateHouse.isPending}>
                     {(createHouse.isPending || updateHouse.isPending) ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
                     {editingId ? "Update House" : "Add House"}
