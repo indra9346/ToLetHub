@@ -1,6 +1,7 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { MapPin, Bed, Bath, Heart, IndianRupee } from "lucide-react";
+import { MapPin, Bed, Bath, Heart, IndianRupee, Navigation } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import type { House } from "@/hooks/useHouses";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/hooks/useAuth";
