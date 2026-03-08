@@ -107,13 +107,7 @@ const MapPage = () => {
     }
   }, [geo.position?.lat, geo.position?.lng]);
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen pt-20 flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
-      </div>
-    );
-  }
+  // Don't block rendering on loading - show map with available data
 
   return (
     <div className="min-h-screen pt-20 pb-24 md:pb-8">
