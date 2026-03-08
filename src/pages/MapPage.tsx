@@ -17,13 +17,16 @@ interface NearbyHouse extends House {
 }
 
 const MapPage = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const navigateToId = searchParams.get("navigate");
   const { data: houses, isLoading } = useHouses({ status: "vacant" });
   const geo = useGeolocation();
-  const [selectedHouseId, setSelectedHouseId] = useState<string | null>(null);
+  const [selectedHouseId, setSelectedHouseId] = useState<string | null>(navigateToId);
   const [navigatingToHouse, setNavigatingToHouse] = useState<NearbyHouse | null>(null);
   const [routePoints, setRoutePoints] = useState<[number, number][] | null>(null);
   const [routeInfo, setRouteInfo] = useState<{ distance: string; duration: string } | null>(null);
-  const [showNearby, setShowNearby] = useState(true);
+  const [showNearby, setShowNearby] = useState(!navigateToId);
+  const [autoNavTriggered, setAutoNavTriggered] = useState(false);
 
   // Start tracking on mount
   useEffect(() => {
