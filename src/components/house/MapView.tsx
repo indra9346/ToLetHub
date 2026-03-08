@@ -45,7 +45,7 @@ const FitBounds = ({ houses }: { houses: MapHouse[] }) => {
 const MapView = ({ houses, center = [12.9716, 77.5946], zoom = 12, className = "h-[400px]", singleMarker = false }: MapViewProps) => {
   return (
     <div className={`rounded-xl overflow-hidden border border-border ${className}`}>
-      <MapContainer center={center} zoom={zoom} className="w-full h-full" scrollWheelZoom>
+      <MapContainer center={center} zoom={zoom} className="w-full h-full" scrollWheelZoom attributionControl={false}>
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

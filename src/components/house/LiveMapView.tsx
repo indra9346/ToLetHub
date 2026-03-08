@@ -87,7 +87,7 @@ const LiveMapView = ({
 
   return (
     <div className={`rounded-xl overflow-hidden border border-border relative ${className}`}>
-      <MapContainer center={center} zoom={14} className="w-full h-full" scrollWheelZoom zoomControl={false}>
+      <MapContainer center={center} zoom={14} className="w-full h-full" scrollWheelZoom zoomControl={false} attributionControl={false}>
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
