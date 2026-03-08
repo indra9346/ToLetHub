@@ -36,7 +36,7 @@ const getCachedPosition = (): GeoPosition | null => {
 };
 
 export const useGeolocation = (): UseGeolocationReturn => {
-  const [position, setPosition] = useState<GeoPosition | null>(getCachedPosition);
+  const [position, setPosition] = useState<GeoPosition | null>(() => getCachedPosition());
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [isTracking, setIsTracking] = useState(false);
