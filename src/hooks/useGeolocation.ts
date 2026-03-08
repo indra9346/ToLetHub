@@ -98,6 +98,7 @@ export const useGeolocation = (): UseGeolocationReturn => {
           timestamp: pos.timestamp,
         };
         setPosition(p);
+        positionRef.current = p;
         cachePosition(p);
         setLoading(false);
         setIsTracking(true);
