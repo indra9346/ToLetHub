@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import heroImage from "@/assets/hero-building.jpg";
 import HouseCard from "@/components/house/HouseCard";
 import { useHouses } from "@/hooks/useHouses";
+import { useAuth } from "@/hooks/useAuth";
 
 const features = [
   { icon: Search, title: "Smart Search", desc: "Find your perfect home with powerful filters for rent, location, rooms, and amenities." },
