@@ -317,15 +317,26 @@ const AdminDashboard = () => {
                       <Switch checked={form.has_kitchen} onCheckedChange={(c) => setForm({ ...form, has_kitchen: c })} /> Kitchen
                     </label>
                   </div>
-                  <div className="grid sm:grid-cols-2 gap-4">
-                    <div>
-                      <label className="text-sm font-medium text-foreground mb-1 block">Latitude *</label>
-                      <Input type="number" step="any" value={form.lat} onChange={(e) => setForm({ ...form, lat: e.target.value })} required />
+                  <div>
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="text-sm font-medium text-foreground">House Location *</label>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className="gap-1 text-xs h-7"
+                        disabled={gettingLocation}
+                        onClick={handleGetLiveLocation}
+                      >
+                        {gettingLocation ? <Loader2 className="w-3 h-3 animate-spin" /> : <LocateFixed className="w-3 h-3" />}
+                        {gettingLocation ? "Getting..." : "📍 Use My Live Location"}
+                      </Button>
                     </div>
-                    <div>
-                      <label className="text-sm font-medium text-foreground mb-1 block">Longitude *</label>
-                      <Input type="number" step="any" value={form.lng} onChange={(e) => setForm({ ...form, lng: e.target.value })} required />
+                    <div className="grid grid-cols-2 gap-3">
+                      <Input type="number" step="any" value={form.lat} onChange={(e) => setForm({ ...form, lat: e.target.value })} required placeholder="Latitude" />
+                      <Input type="number" step="any" value={form.lng} onChange={(e) => setForm({ ...form, lng: e.target.value })} required placeholder="Longitude" />
                     </div>
+                    <p className="text-xs text-muted-foreground mt-1">Tap "Use My Live Location" to auto-fill from GPS</p>
                   </div>
                   <div>
                     <label className="text-sm font-medium text-foreground mb-1 block">Amenities (comma-separated)</label>
