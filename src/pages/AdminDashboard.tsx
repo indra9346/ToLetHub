@@ -63,38 +63,19 @@ const AdminDashboard = () => {
     if (!user) return;
     setPromoting(true);
     try {
-      // First check if role already exists
-      const { data: existing } = await supabase
-        .from("user_roles")
-        .select("id")
-        .eq("user_id", user.id)
-        .eq("role", "admin" as any)
-        .maybeSingle();
-
-      if (existing) {
-        toast.info("You already have owner access! Refreshing...");
-        setTimeout(() => window.location.reload(), 800);
-        return;
-      }
-
       const { error } = await supabase.from("user_roles").insert({
         user_id: user.id,
         role: "admin" as any,
       });
-      if (error) {
-        if (error.code === "23505") {
-          toast.info("You already have owner access! Refreshing...");
-          setTimeout(() => window.location.reload(), 800);
-        } else {
-          toast.error("Failed to register: " + error.message);
-        }
-      } else {
-        toast.success("🎉 You're now a house owner! Refreshing...");
-        setTimeout(() => window.location.reload(), 800);
+      if (error && error.code !== "23505") {
+        toast.error("Failed to register: " + error.message);
+        setPromoting(false);
+        return;
       }
+      toast.success("🎉 You're now a house owner! Refreshing...");
+      window.location.reload();
     } catch (err: any) {
       toast.error("Something went wrong. Please try again.");
-    } finally {
       setPromoting(false);
     }
   };
