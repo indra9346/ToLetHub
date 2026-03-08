@@ -91,10 +91,10 @@ const Navbar = () => {
                   </Link>
                 );
               })}
-              {isAdmin && (
+              {user && (
                 <Link to="/admin" onClick={() => setMobileOpen(false)}>
                   <Button variant={location.pathname === "/admin" ? "default" : "ghost"} className="w-full justify-start">
-                    <LayoutDashboard className="w-4 h-4 mr-2" />Dashboard
+                    <LayoutDashboard className="w-4 h-4 mr-2" />{isAdmin ? "Dashboard" : "List My House"}
                   </Button>
                 </Link>
               )}
