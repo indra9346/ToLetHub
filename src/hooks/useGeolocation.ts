@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 
 interface GeoPosition {
   lat: number;
@@ -18,12 +18,29 @@ interface UseGeolocationReturn {
   isTracking: boolean;
 }
 
+const POSITION_CACHE_KEY = "tolethub-last-position";
+
+const cachePosition = (pos: GeoPosition) => {
+  try {
+    localStorage.setItem(POSITION_CACHE_KEY, JSON.stringify(pos));
+  } catch {}
+};
+
+const getCachedPosition = (): GeoPosition | null => {
+  try {
+    const raw = localStorage.getItem(POSITION_CACHE_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+};
+
 export const useGeolocation = (): UseGeolocationReturn => {
-  const [position, setPosition] = useState<GeoPosition | null>(null);
+  const [position, setPosition] = useState<GeoPosition | null>(getCachedPosition);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [watchId, setWatchId] = useState<number | null>(null);
   const [isTracking, setIsTracking] = useState(false);
+  const watchIdRef = useRef<number | null>(null);
 
   const startTracking = useCallback(() => {
     if (!navigator.geolocation) {
@@ -31,57 +48,101 @@ export const useGeolocation = (): UseGeolocationReturn => {
       return;
     }
 
+    // Stop existing watch first
+    if (watchIdRef.current !== null) {
+      navigator.geolocation.clearWatch(watchIdRef.current);
+    }
+
     setLoading(true);
     setError(null);
 
-    const id = navigator.geolocation.watchPosition(
+    // First try getCurrentPosition for a quick fix
+    navigator.geolocation.getCurrentPosition(
       (pos) => {
-        setPosition({
+        const p: GeoPosition = {
           lat: pos.coords.latitude,
           lng: pos.coords.longitude,
           accuracy: pos.coords.accuracy,
           heading: pos.coords.heading,
           speed: pos.coords.speed,
           timestamp: pos.timestamp,
-        });
+        };
+        setPosition(p);
+        cachePosition(p);
         setLoading(false);
         setIsTracking(true);
       },
+      () => {
+        // If getCurrentPosition fails, use cached position as fallback
+        const cached = getCachedPosition();
+        if (cached) {
+          setPosition(cached);
+          setIsTracking(true);
+          setLoading(false);
+        }
+      },
+      { enableHighAccuracy: false, timeout: 10000, maximumAge: 60000 }
+    );
+
+    // Then watch for high-accuracy updates
+    const id = navigator.geolocation.watchPosition(
+      (pos) => {
+        const p: GeoPosition = {
+          lat: pos.coords.latitude,
+          lng: pos.coords.longitude,
+          accuracy: pos.coords.accuracy,
+          heading: pos.coords.heading,
+          speed: pos.coords.speed,
+          timestamp: pos.timestamp,
+        };
+        setPosition(p);
+        cachePosition(p);
+        setLoading(false);
+        setIsTracking(true);
+        setError(null);
+      },
       (err) => {
-        setError(
-          err.code === 1
-            ? "Location access denied. Please enable location permissions."
-            : err.code === 2
-            ? "Location unavailable. Check your GPS settings."
-            : "Location request timed out. Try again."
-        );
+        const cached = getCachedPosition();
+        if (cached && !position) {
+          setPosition(cached);
+          setIsTracking(true);
+        }
+        if (!position && !cached) {
+          setError(
+            err.code === 1
+              ? "Location access denied. Please enable location permissions."
+              : err.code === 2
+              ? "Location unavailable. Check your GPS or try outdoors."
+              : "Location timed out. Using last known location if available."
+          );
+        }
         setLoading(false);
       },
       {
         enableHighAccuracy: true,
-        timeout: 15000,
-        maximumAge: 0,
+        timeout: 30000,
+        maximumAge: 5000,
       }
     );
 
-    setWatchId(id);
+    watchIdRef.current = id;
   }, []);
 
   const stopTracking = useCallback(() => {
-    if (watchId !== null) {
-      navigator.geolocation.clearWatch(watchId);
-      setWatchId(null);
+    if (watchIdRef.current !== null) {
+      navigator.geolocation.clearWatch(watchIdRef.current);
+      watchIdRef.current = null;
     }
     setIsTracking(false);
-  }, [watchId]);
+  }, []);
 
   useEffect(() => {
     return () => {
-      if (watchId !== null) {
-        navigator.geolocation.clearWatch(watchId);
+      if (watchIdRef.current !== null) {
+        navigator.geolocation.clearWatch(watchIdRef.current);
       }
     };
-  }, [watchId]);
+  }, []);
 
   return { position, error, loading, startTracking, stopTracking, isTracking };
 };
