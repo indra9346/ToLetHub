@@ -17,6 +17,7 @@ const features = [
 
 const Landing = () => {
   const { data: houses } = useHouses({ status: "vacant" });
+  const { user } = useAuth();
   const featured = (houses ?? []).slice(0, 3);
 
   return (
