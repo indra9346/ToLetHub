@@ -22,8 +22,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const checkAdmin = useCallback((userId: string) => {
     supabase.rpc("has_role", { _user_id: userId, _role: "admin" })
-      .then(({ data }) => setIsAdmin(!!data))
-      .catch(() => setIsAdmin(false));
+      .then(({ data }) => setIsAdmin(!!data));
   }, []);
 
   useEffect(() => {
