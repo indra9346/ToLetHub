@@ -18,7 +18,7 @@ const Auth = () => {
   const [submitting, setSubmitting] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [role, setRole] = useState<"tenant" | "owner">("tenant");
-  const { signIn, signUp, user } = useAuth();
+  const { signIn, signUp, user, loading } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
