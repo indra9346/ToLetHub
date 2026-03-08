@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import {
   Loader2, LocateFixed, Navigation, X, MapPin, IndianRupee,
   Bed, ArrowRight, Route, Clock, Compass
@@ -17,13 +17,16 @@ interface NearbyHouse extends House {
 }
 
 const MapPage = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const navigateToId = searchParams.get("navigate");
   const { data: houses, isLoading } = useHouses({ status: "vacant" });
   const geo = useGeolocation();
-  const [selectedHouseId, setSelectedHouseId] = useState<string | null>(null);
+  const [selectedHouseId, setSelectedHouseId] = useState<string | null>(navigateToId);
   const [navigatingToHouse, setNavigatingToHouse] = useState<NearbyHouse | null>(null);
   const [routePoints, setRoutePoints] = useState<[number, number][] | null>(null);
   const [routeInfo, setRouteInfo] = useState<{ distance: string; duration: string } | null>(null);
-  const [showNearby, setShowNearby] = useState(true);
+  const [showNearby, setShowNearby] = useState(!navigateToId);
+  const [autoNavTriggered, setAutoNavTriggered] = useState(false);
 
   // Start tracking on mount
   useEffect(() => {
@@ -42,6 +45,25 @@ const MapPage = () => {
       .sort((a, b) => a.distance - b.distance)
       .slice(0, 10);
   }, [geo.position, houses]);
+
+  // Auto-navigate to a house when coming from HouseDetail "Confirm & Navigate"
+  useEffect(() => {
+    if (navigateToId && houses && geo.position && !autoNavTriggered) {
+      const house = houses.find((h) => h.id === navigateToId);
+      if (house) {
+        const nh: NearbyHouse = {
+          ...house,
+          distance: getDistanceKm(geo.position.lat, geo.position.lng, house.lat, house.lng),
+        };
+        setAutoNavTriggered(true);
+        setNavigatingToHouse(nh);
+        setSelectedHouseId(nh.id);
+        setShowNearby(false);
+        // Clear the query param
+        setSearchParams({}, { replace: true });
+      }
+    }
+  }, [navigateToId, houses, geo.position, autoNavTriggered]);
 
   // Fetch route using OSRM (free, no API key needed)
   const fetchRoute = useCallback(
@@ -90,14 +112,13 @@ const MapPage = () => {
     setShowNearby(true);
   };
 
-  // Update route as user moves
+  // Update route as user moves or when navigation starts
   useEffect(() => {
     if (navigatingToHouse && geo.position) {
       const dist = getDistanceKm(
         geo.position.lat, geo.position.lng,
         navigatingToHouse.lat, navigatingToHouse.lng
       );
-      // Refresh route every position update
       if (dist > 0.05) {
         fetchRoute(navigatingToHouse.lat, navigatingToHouse.lng);
       } else {
@@ -105,7 +126,7 @@ const MapPage = () => {
         cancelNavigation();
       }
     }
-  }, [geo.position?.lat, geo.position?.lng]);
+  }, [geo.position?.lat, geo.position?.lng, navigatingToHouse?.id]);
 
   // Don't block rendering on loading - show map with available data
 

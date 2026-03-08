@@ -54,6 +54,7 @@ const AdminDashboard = () => {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [imageFiles, setImageFiles] = useState<File[]>([]);
+  const [videoFiles, setVideoFiles] = useState<File[]>([]);
   const [promoting, setPromoting] = useState(false);
   const [gettingLocation, setGettingLocation] = useState(false);
 
@@ -175,6 +176,24 @@ const AdminDashboard = () => {
       imageUrls.push(urlData.publicUrl);
     }
 
+    // Upload videos
+    const videoUrls: string[] = [];
+    for (const file of videoFiles) {
+      if (file.size > 50 * 1024 * 1024) {
+        toast.error("Video file too large (max 50MB): " + file.name);
+        return;
+      }
+      const ext = file.name.split(".").pop();
+      const path = `${user.id}/videos/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+      const { error } = await supabase.storage.from("house-images").upload(path, file);
+      if (error) {
+        toast.error("Failed to upload video: " + error.message);
+        return;
+      }
+      const { data: urlData } = supabase.storage.from("house-images").getPublicUrl(path);
+      videoUrls.push(urlData.publicUrl);
+    }
+
     const houseData = {
       title: form.title,
       address: form.address,
@@ -194,6 +213,7 @@ const AdminDashboard = () => {
       status: form.status,
       owner_id: user.id,
       images: imageUrls.length > 0 ? imageUrls : undefined,
+      videos: videoUrls.length > 0 ? videoUrls : undefined,
     };
 
     try {
@@ -377,6 +397,11 @@ const AdminDashboard = () => {
                     <label className="text-sm font-medium text-foreground mb-1 block">House Images (Bedroom, Kitchen, Hall, etc.)</label>
                     <Input type="file" accept="image/*" multiple onChange={(e) => setImageFiles(Array.from(e.target.files || []))} />
                     <p className="text-xs text-muted-foreground mt-1">Upload multiple photos — bedrooms, kitchen, hall, bathrooms, exterior</p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-foreground mb-1 block">House Videos (Walkthrough, Room Tours)</label>
+                    <Input type="file" accept="video/*" multiple onChange={(e) => setVideoFiles(Array.from(e.target.files || []))} />
+                    <p className="text-xs text-muted-foreground mt-1">Upload walkthrough videos of your property (max 50MB each)</p>
                   </div>
                   <Button type="submit" className="w-full" disabled={createHouse.isPending || updateHouse.isPending}>
                     {(createHouse.isPending || updateHouse.isPending) ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}

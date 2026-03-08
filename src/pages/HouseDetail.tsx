@@ -1,8 +1,9 @@
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
   ArrowLeft, MapPin, Bed, Bath, Home, ChefHat, Phone, Mail,
-  Heart, Share2, IndianRupee, Maximize, Calendar, CheckCircle, Loader2
+  Heart, Share2, IndianRupee, Maximize, Calendar, CheckCircle, Loader2,
+  Navigation, Play, Video
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -15,6 +16,7 @@ import { toast } from "sonner";
 
 const HouseDetail = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const { data: house, isLoading } = useHouse(id!);
   const [activeImg, setActiveImg] = useState(0);
   const { user } = useAuth();
@@ -25,6 +27,15 @@ const HouseDetail = () => {
   const toggleFav = () => {
     if (!user) { toast.info("Sign in to save favorites"); return; }
     toggleFavMutation.mutate({ houseId: id!, isFav });
+  };
+
+  const handleConfirmAndNavigate = () => {
+    if (!user) {
+      toast.info("Sign in to confirm and navigate to this house");
+      return;
+    }
+    toast.success("🏠 House confirmed! Starting live navigation...");
+    navigate(`/map?navigate=${id}`);
   };
 
   if (isLoading) {
@@ -47,6 +58,7 @@ const HouseDetail = () => {
   }
 
   const images = house.images?.length ? house.images : ["https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800"];
+  const videos = (house as any).videos ?? [];
 
   return (
     <div className="min-h-screen pt-20 pb-24 md:pb-8">
@@ -65,12 +77,36 @@ const HouseDetail = () => {
             </motion.div>
 
             {images.length > 1 && (
-              <div className="flex gap-2">
+              <div className="flex gap-2 overflow-x-auto pb-1">
                 {images.map((img, i) => (
-                  <button key={i} onClick={() => setActiveImg(i)} className={`w-20 h-16 rounded-lg overflow-hidden border-2 transition-all ${activeImg === i ? "border-primary" : "border-transparent opacity-60 hover:opacity-100"}`}>
+                  <button key={i} onClick={() => setActiveImg(i)} className={`w-20 h-16 rounded-lg overflow-hidden border-2 transition-all shrink-0 ${activeImg === i ? "border-primary" : "border-transparent opacity-60 hover:opacity-100"}`}>
                     <img src={img} alt="" className="w-full h-full object-cover" />
                   </button>
                 ))}
+              </div>
+            )}
+
+            {/* Videos Section */}
+            {videos.length > 0 && (
+              <div>
+                <h3 className="font-display text-lg font-semibold text-foreground mb-3 flex items-center gap-2">
+                  <Video className="w-5 h-5 text-primary" /> Property Videos
+                </h3>
+                <div className="grid gap-4">
+                  {videos.map((videoUrl: string, i: number) => (
+                    <div key={i} className="rounded-xl overflow-hidden bg-secondary">
+                      <video
+                        controls
+                        preload="metadata"
+                        className="w-full max-h-[400px] rounded-xl"
+                        poster=""
+                      >
+                        <source src={videoUrl} />
+                        Your browser does not support video playback.
+                      </video>
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
 
@@ -132,6 +168,23 @@ const HouseDetail = () => {
           </div>
 
           <div className="lg:col-span-2 space-y-6">
+            {/* Confirm & Navigate CTA */}
+            {house.status === "vacant" && (
+              <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.15 }}>
+                <Button
+                  onClick={handleConfirmAndNavigate}
+                  size="lg"
+                  className="w-full gap-2 text-base h-14 bg-gradient-to-r from-primary to-primary/80"
+                >
+                  <Navigation className="w-5 h-5" />
+                  Confirm & Navigate to House
+                </Button>
+                <p className="text-xs text-muted-foreground text-center mt-2">
+                  Get live GPS directions to this property
+                </p>
+              </motion.div>
+            )}
+
             <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }} className="bg-card rounded-xl p-6 card-shadow sticky top-24">
               <h3 className="font-display text-lg font-semibold text-card-foreground mb-4">Contact Owner</h3>
               <div className="space-y-3 mb-6">
