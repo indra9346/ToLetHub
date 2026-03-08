@@ -46,6 +46,25 @@ const MapPage = () => {
       .slice(0, 10);
   }, [geo.position, houses]);
 
+  // Auto-navigate to a house when coming from HouseDetail "Confirm & Navigate"
+  useEffect(() => {
+    if (navigateToId && houses && geo.position && !autoNavTriggered) {
+      const house = houses.find((h) => h.id === navigateToId);
+      if (house) {
+        const nh: NearbyHouse = {
+          ...house,
+          distance: getDistanceKm(geo.position.lat, geo.position.lng, house.lat, house.lng),
+        };
+        setAutoNavTriggered(true);
+        setNavigatingToHouse(nh);
+        setSelectedHouseId(nh.id);
+        setShowNearby(false);
+        // Clear the query param
+        setSearchParams({}, { replace: true });
+      }
+    }
+  }, [navigateToId, houses, geo.position, autoNavTriggered]);
+
   // Fetch route using OSRM (free, no API key needed)
   const fetchRoute = useCallback(
     async (destLat: number, destLng: number) => {
