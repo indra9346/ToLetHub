@@ -85,12 +85,31 @@ const HouseCard = ({ house, index = 0 }: HouseCardProps) => {
               </span>
               {house.area && <span>{house.area} sq.ft</span>}
             </div>
-            <div className="flex items-center text-primary font-display font-bold text-lg">
-              <IndianRupee className="w-4 h-4" />
-              {Number(house.rent).toLocaleString("en-IN")}
-              <span className="text-muted-foreground text-sm font-normal ml-1">/mo</span>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center text-primary font-display font-bold text-lg">
+                <IndianRupee className="w-4 h-4" />
+                {Number(house.rent).toLocaleString("en-IN")}
+                <span className="text-muted-foreground text-sm font-normal ml-1">/mo</span>
+              </div>
+              {house.status === "vacant" && (
+                <Button
+                  size="sm"
+                  className="gap-1 text-xs h-8"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (!user) {
+                      toast.info("Sign in to navigate to this house");
+                      return;
+                    }
+                    toast.success("🏠 Starting navigation...");
+                    navigate(`/map?navigate=${house.id}`);
+                  }}
+                >
+                  <Navigation className="w-3 h-3" /> Visit
+                </Button>
+              )}
             </div>
-          </div>
         </div>
       </Link>
     </motion.div>
