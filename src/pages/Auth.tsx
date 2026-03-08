@@ -23,11 +23,18 @@ const Auth = () => {
 
   useEffect(() => {
     if (user) {
-      navigate("/listings");
+      navigate("/listings", { replace: true });
     }
   }, [user, navigate]);
 
-  if (user) return null;
+  // Show loading while auth is restoring session
+  if (loading || user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
