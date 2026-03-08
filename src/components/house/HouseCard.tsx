@@ -110,6 +110,7 @@ const HouseCard = ({ house, index = 0 }: HouseCardProps) => {
                 </Button>
               )}
             </div>
+          </div>
         </div>
       </Link>
     </motion.div>
