@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import {
   Loader2, LocateFixed, Navigation, X, MapPin, IndianRupee,
   Bed, ArrowRight, Route, Clock, Compass
