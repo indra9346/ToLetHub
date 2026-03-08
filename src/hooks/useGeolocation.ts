@@ -106,11 +106,12 @@ export const useGeolocation = (): UseGeolocationReturn => {
       },
       (err) => {
         const cached = getCachedPosition();
-        if (cached && !position) {
+        if (cached && !positionRef.current) {
           setPosition(cached);
+          positionRef.current = cached;
           setIsTracking(true);
         }
-        if (!position && !cached) {
+        if (!positionRef.current && !cached) {
           setError(
             err.code === 1
               ? "Location access denied. Please enable location permissions."
