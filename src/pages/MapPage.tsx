@@ -112,14 +112,13 @@ const MapPage = () => {
     setShowNearby(true);
   };
 
-  // Update route as user moves
+  // Update route as user moves or when navigation starts
   useEffect(() => {
     if (navigatingToHouse && geo.position) {
       const dist = getDistanceKm(
         geo.position.lat, geo.position.lng,
         navigatingToHouse.lat, navigatingToHouse.lng
       );
-      // Refresh route every position update
       if (dist > 0.05) {
         fetchRoute(navigatingToHouse.lat, navigatingToHouse.lng);
       } else {
@@ -127,7 +126,7 @@ const MapPage = () => {
         cancelNavigation();
       }
     }
-  }, [geo.position?.lat, geo.position?.lng]);
+  }, [geo.position?.lat, geo.position?.lng, navigatingToHouse?.id]);
 
   // Don't block rendering on loading - show map with available data
 
