@@ -176,6 +176,24 @@ const AdminDashboard = () => {
       imageUrls.push(urlData.publicUrl);
     }
 
+    // Upload videos
+    const videoUrls: string[] = [];
+    for (const file of videoFiles) {
+      if (file.size > 50 * 1024 * 1024) {
+        toast.error("Video file too large (max 50MB): " + file.name);
+        return;
+      }
+      const ext = file.name.split(".").pop();
+      const path = `${user.id}/videos/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+      const { error } = await supabase.storage.from("house-images").upload(path, file);
+      if (error) {
+        toast.error("Failed to upload video: " + error.message);
+        return;
+      }
+      const { data: urlData } = supabase.storage.from("house-images").getPublicUrl(path);
+      videoUrls.push(urlData.publicUrl);
+    }
+
     const houseData = {
       title: form.title,
       address: form.address,
@@ -195,6 +213,7 @@ const AdminDashboard = () => {
       status: form.status,
       owner_id: user.id,
       images: imageUrls.length > 0 ? imageUrls : undefined,
+      videos: videoUrls.length > 0 ? videoUrls : undefined,
     };
 
     try {
