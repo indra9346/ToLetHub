@@ -61,11 +61,12 @@ const Auth = () => {
   const handleGoogleSignIn = async () => {
     setGoogleLoading(true);
     try {
-      const result = await lovable.auth.signInWithOAuth("google", {
+      const result: any = await lovable.auth.signInWithOAuth("google", {
         redirect_uri: window.location.origin,
       });
       if (result?.error) {
-        toast.error(typeof result.error === "string" ? result.error : result.error.message || "Google sign-in failed");
+        const msg = typeof result.error === "string" ? result.error : result.error?.message || "Google sign-in failed";
+        toast.error(msg);
       }
     } catch (err: any) {
       toast.error(err?.message || "Google sign-in failed. Please try email sign-in.");
