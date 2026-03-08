@@ -128,6 +128,7 @@ const MapPage = () => {
                   <span className="flex items-center gap-1">
                     <span className="w-2 h-2 rounded-full bg-success animate-pulse" />
                     Live tracking · {nearbyHouses.length} houses nearby
+                    {!navigator.onLine && " · Offline mode"}
                   </span>
                 ) : geo.loading ? (
                   "Getting your location..."
@@ -142,9 +143,12 @@ const MapPage = () => {
               </Button>
             )}
           </div>
-          {geo.error && (
-            <div className="mt-2 p-3 rounded-lg bg-destructive/10 text-destructive text-sm flex items-center gap-2">
-              <MapPin className="w-4 h-4 shrink-0" /> {geo.error}
+          {geo.error && geo.position === null && (
+            <div className="mt-2 p-3 rounded-lg bg-warning/10 text-warning text-sm flex items-center justify-between">
+              <span className="flex items-center gap-2">
+                <MapPin className="w-4 h-4 shrink-0" /> {geo.error}
+              </span>
+              <Button variant="ghost" size="sm" onClick={geo.startTracking} className="text-xs shrink-0">Retry</Button>
             </div>
           )}
         </motion.div>
