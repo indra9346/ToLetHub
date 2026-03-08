@@ -41,6 +41,7 @@ export const useGeolocation = (): UseGeolocationReturn => {
   const [loading, setLoading] = useState(false);
   const [isTracking, setIsTracking] = useState(false);
   const watchIdRef = useRef<number | null>(null);
+  const positionRef = useRef<GeoPosition | null>(getCachedPosition());
 
   const startTracking = useCallback(() => {
     if (!navigator.geolocation) {
