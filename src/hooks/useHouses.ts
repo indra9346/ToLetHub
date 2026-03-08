@@ -57,7 +57,7 @@ export const useHouse = (id: string) => {
         .from("houses")
         .select("*")
         .eq("id", id)
-        .single();
+        .maybeSingle();
       if (error) throw error;
       return data;
     },
