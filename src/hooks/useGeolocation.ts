@@ -36,11 +36,12 @@ const getCachedPosition = (): GeoPosition | null => {
 };
 
 export const useGeolocation = (): UseGeolocationReturn => {
-  const [position, setPosition] = useState<GeoPosition | null>(getCachedPosition);
+  const [position, setPosition] = useState<GeoPosition | null>(() => getCachedPosition());
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [isTracking, setIsTracking] = useState(false);
   const watchIdRef = useRef<number | null>(null);
+  const positionRef = useRef<GeoPosition | null>(getCachedPosition());
 
   const startTracking = useCallback(() => {
     if (!navigator.geolocation) {
@@ -68,6 +69,7 @@ export const useGeolocation = (): UseGeolocationReturn => {
           timestamp: pos.timestamp,
         };
         setPosition(p);
+        positionRef.current = p;
         cachePosition(p);
         setLoading(false);
         setIsTracking(true);
@@ -96,6 +98,7 @@ export const useGeolocation = (): UseGeolocationReturn => {
           timestamp: pos.timestamp,
         };
         setPosition(p);
+        positionRef.current = p;
         cachePosition(p);
         setLoading(false);
         setIsTracking(true);
@@ -103,11 +106,12 @@ export const useGeolocation = (): UseGeolocationReturn => {
       },
       (err) => {
         const cached = getCachedPosition();
-        if (cached && !position) {
+        if (cached && !positionRef.current) {
           setPosition(cached);
+          positionRef.current = cached;
           setIsTracking(true);
         }
-        if (!position && !cached) {
+        if (!positionRef.current && !cached) {
           setError(
             err.code === 1
               ? "Location access denied. Please enable location permissions."
