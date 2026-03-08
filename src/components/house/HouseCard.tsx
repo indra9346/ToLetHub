@@ -14,6 +14,7 @@ interface HouseCardProps {
 }
 
 const HouseCard = ({ house, index = 0 }: HouseCardProps) => {
+  const navigate = useNavigate();
   const { user } = useAuth();
   const { data: favIds } = useFavoriteIds();
   const toggleFav = useToggleFavorite();
