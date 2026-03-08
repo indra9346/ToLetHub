@@ -19,7 +19,12 @@ import { useMyHouses, useCreateHouse, useUpdateHouse, useDeleteHouse, type House
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
-const emptyForm = {
+const emptyForm: {
+  title: string; address: string; description: string; rent: string; rooms: string;
+  bathrooms: string; has_hall: boolean; has_kitchen: boolean; area: string;
+  lat: string; lng: string; amenities: string; contact_name: string;
+  contact_phone: string; contact_email: string; status: string;
+} = {
   title: "",
   address: "",
   description: "",
