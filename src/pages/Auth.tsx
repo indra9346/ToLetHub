@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSearchParams, Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Home, Mail, Lock, User, ArrowRight, Eye, EyeOff } from "lucide-react";
+import { Home, Mail, Lock, User, ArrowRight, Eye, EyeOff, Building2, UserCheck, Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -16,13 +16,18 @@ const Auth = () => {
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
+  const [role, setRole] = useState<"tenant" | "owner">("tenant");
   const { signIn, signUp, user } = useAuth();
   const navigate = useNavigate();
 
-  if (user) {
-    navigate("/listings");
-    return null;
-  }
+  useEffect(() => {
+    if (user) {
+      navigate("/listings");
+    }
+  }, [user, navigate]);
+
+  if (user) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,7 +38,11 @@ const Auth = () => {
         if (error) {
           toast.error(error.message);
         } else {
-          toast.success("Account created! Check your email to confirm, or sign in directly.");
+          if (role === "owner") {
+            toast.success("Account created! You can now list your properties from the Dashboard.");
+          } else {
+            toast.success("Account created! You can now browse and save houses.");
+          }
         }
       } else {
         const { error } = await signIn(email, password);
@@ -46,6 +55,23 @@ const Auth = () => {
       }
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    setGoogleLoading(true);
+    try {
+      const result: any = await lovable.auth.signInWithOAuth("google", {
+        redirect_uri: window.location.origin,
+      });
+      if (result?.error) {
+        const msg = typeof result.error === "string" ? result.error : result.error?.message || "Google sign-in failed";
+        toast.error(msg);
+      }
+    } catch (err: any) {
+      toast.error(err?.message || "Google sign-in failed. Please try email sign-in.");
+    } finally {
+      setGoogleLoading(false);
     }
   };
 
@@ -69,11 +95,71 @@ const Auth = () => {
             {isSignUp ? "Create your account" : "Welcome back"}
           </h1>
           <p className="text-muted-foreground mt-1">
-            {isSignUp ? "Start finding your perfect rental home" : "Sign in to continue to ToLetHub"}
+            {isSignUp ? "Join as a tenant or house owner" : "Sign in to continue to ToLetHub"}
           </p>
         </div>
 
         <div className="bg-card rounded-2xl p-6 sm:p-8 card-shadow">
+          {/* Role selector for signup */}
+          {isSignUp && (
+            <div className="mb-6">
+              <label className="text-sm font-medium text-foreground mb-2 block">I want to</label>
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  type="button"
+                  onClick={() => setRole("tenant")}
+                  className={`flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all ${
+                    role === "tenant"
+                      ? "border-primary bg-primary/5"
+                      : "border-border hover:border-muted-foreground/30"
+                  }`}
+                >
+                  <UserCheck className={`w-6 h-6 ${role === "tenant" ? "text-primary" : "text-muted-foreground"}`} />
+                  <span className={`text-sm font-medium ${role === "tenant" ? "text-foreground" : "text-muted-foreground"}`}>
+                    Find a House
+                  </span>
+                  <span className="text-[10px] text-muted-foreground">Browse & rent</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setRole("owner")}
+                  className={`flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all ${
+                    role === "owner"
+                      ? "border-primary bg-primary/5"
+                      : "border-border hover:border-muted-foreground/30"
+                  }`}
+                >
+                  <Building2 className={`w-6 h-6 ${role === "owner" ? "text-primary" : "text-muted-foreground"}`} />
+                  <span className={`text-sm font-medium ${role === "owner" ? "text-foreground" : "text-muted-foreground"}`}>
+                    List My House
+                  </span>
+                  <span className="text-[10px] text-muted-foreground">Add & manage</span>
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Google Sign-In */}
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full gap-2 h-11"
+            disabled={googleLoading}
+            onClick={handleGoogleSignIn}
+          >
+            {googleLoading ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <svg className="w-4 h-4" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+            )}
+            {googleLoading ? "Signing in..." : "Continue with Google"}
+          </Button>
+
+          <div className="relative my-5">
+            <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-border" /></div>
+            <div className="relative flex justify-center text-xs"><span className="bg-card px-2 text-muted-foreground">or with email</span></div>
+          </div>
+
           <form onSubmit={handleSubmit} className="space-y-4">
             {isSignUp && (
               <div>
@@ -102,30 +188,11 @@ const Auth = () => {
               </div>
             </div>
             <Button type="submit" className="w-full gap-2" size="lg" disabled={submitting}>
-              {submitting ? "Please wait..." : isSignUp ? "Create Account" : "Sign In"}
+              {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
+              {submitting ? "Please wait..." : isSignUp ? (role === "owner" ? "Create Owner Account" : "Create Account") : "Sign In"}
               {!submitting && <ArrowRight className="w-4 h-4" />}
             </Button>
           </form>
-
-          <div className="relative my-6">
-            <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-border" /></div>
-            <div className="relative flex justify-center text-xs"><span className="bg-card px-2 text-muted-foreground">or continue with</span></div>
-          </div>
-
-          <Button
-            type="button"
-            variant="outline"
-            className="w-full gap-2"
-            onClick={async () => {
-              const { error } = await lovable.auth.signInWithOAuth("google", {
-                redirect_uri: window.location.origin,
-              });
-              if (error) toast.error(error.message);
-            }}
-          >
-            <svg className="w-4 h-4" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
-            Sign in with Google
-          </Button>
 
           <div className="mt-6 text-center text-sm">
             <span className="text-muted-foreground">

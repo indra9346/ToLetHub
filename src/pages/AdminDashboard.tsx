@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
   Plus, Edit2, Trash2, Home, Eye, EyeOff, Loader2, IndianRupee,
-  MapPin, LayoutDashboard, LogOut, Bed
+  MapPin, LayoutDashboard, LogOut, Bed, Building2, LocateFixed
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -34,8 +34,8 @@ const emptyForm: {
   has_hall: false,
   has_kitchen: true,
   area: "",
-  lat: "12.9716",
-  lng: "77.5946",
+  lat: "",
+  lng: "",
   amenities: "",
   contact_name: "",
   contact_phone: "",
@@ -54,15 +54,88 @@ const AdminDashboard = () => {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [imageFiles, setImageFiles] = useState<File[]>([]);
+  const [promoting, setPromoting] = useState(false);
+  const [gettingLocation, setGettingLocation] = useState(false);
 
-  if (!user || !isAdmin) {
+  // Self-promote to owner/admin
+  const handleBecomeOwner = async () => {
+    if (!user) return;
+    setPromoting(true);
+    try {
+      const { error } = await supabase.from("user_roles").insert({
+        user_id: user.id,
+        role: "admin" as any,
+      });
+      if (error) {
+        if (error.code === "23505") {
+          toast.info("You already have owner access! Please refresh the page.");
+        } else {
+          toast.error(error.message);
+        }
+      } else {
+        toast.success("🎉 You're now a house owner! Refreshing...");
+        setTimeout(() => window.location.reload(), 1000);
+      }
+    } finally {
+      setPromoting(false);
+    }
+  };
+
+  // Get live GPS location
+  const handleGetLiveLocation = () => {
+    if (!navigator.geolocation) {
+      toast.error("Geolocation not supported by your browser");
+      return;
+    }
+    setGettingLocation(true);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setForm((f) => ({
+          ...f,
+          lat: pos.coords.latitude.toFixed(6),
+          lng: pos.coords.longitude.toFixed(6),
+        }));
+        toast.success("📍 Live location captured!");
+        setGettingLocation(false);
+      },
+      (err) => {
+        toast.error("Could not get location: " + err.message);
+        setGettingLocation(false);
+      },
+      { enableHighAccuracy: true, timeout: 15000 }
+    );
+  };
+
+  if (!user) {
     return (
       <div className="min-h-screen pt-20 flex items-center justify-center">
         <div className="text-center">
           <LayoutDashboard className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-          <h3 className="font-display text-xl font-semibold text-foreground mb-2">Admin Access Required</h3>
-          <p className="text-muted-foreground mb-6">You need admin privileges to access the dashboard.</p>
-          <Button onClick={() => navigate("/listings")}>Browse Listings</Button>
+          <h3 className="font-display text-xl font-semibold text-foreground mb-2">Sign In Required</h3>
+          <p className="text-muted-foreground mb-6">Please sign in to access the owner dashboard.</p>
+          <Button onClick={() => navigate("/auth")}>Sign In</Button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isAdmin) {
+    return (
+      <div className="min-h-screen pt-20 flex items-center justify-center">
+        <div className="text-center max-w-md">
+          <Building2 className="w-14 h-14 text-primary mx-auto mb-4" />
+          <h3 className="font-display text-2xl font-bold text-foreground mb-2">Become a House Owner</h3>
+          <p className="text-muted-foreground mb-6">
+            Want to list your property on ToLetHub? Register as an owner to add your house details, 
+            upload room photos, and share your live location with potential tenants.
+          </p>
+          <Button onClick={handleBecomeOwner} disabled={promoting} className="gap-2" size="lg">
+            {promoting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Building2 className="w-4 h-4" />}
+            {promoting ? "Setting up..." : "Register as House Owner"}
+          </Button>
+          <p className="text-xs text-muted-foreground mt-4">
+            You'll be able to add houses, upload images, and manage listings.
+          </p>
         </div>
       </div>
     );
@@ -244,15 +317,26 @@ const AdminDashboard = () => {
                       <Switch checked={form.has_kitchen} onCheckedChange={(c) => setForm({ ...form, has_kitchen: c })} /> Kitchen
                     </label>
                   </div>
-                  <div className="grid sm:grid-cols-2 gap-4">
-                    <div>
-                      <label className="text-sm font-medium text-foreground mb-1 block">Latitude *</label>
-                      <Input type="number" step="any" value={form.lat} onChange={(e) => setForm({ ...form, lat: e.target.value })} required />
+                  <div>
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="text-sm font-medium text-foreground">House Location *</label>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className="gap-1 text-xs h-7"
+                        disabled={gettingLocation}
+                        onClick={handleGetLiveLocation}
+                      >
+                        {gettingLocation ? <Loader2 className="w-3 h-3 animate-spin" /> : <LocateFixed className="w-3 h-3" />}
+                        {gettingLocation ? "Getting..." : "📍 Use My Live Location"}
+                      </Button>
                     </div>
-                    <div>
-                      <label className="text-sm font-medium text-foreground mb-1 block">Longitude *</label>
-                      <Input type="number" step="any" value={form.lng} onChange={(e) => setForm({ ...form, lng: e.target.value })} required />
+                    <div className="grid grid-cols-2 gap-3">
+                      <Input type="number" step="any" value={form.lat} onChange={(e) => setForm({ ...form, lat: e.target.value })} required placeholder="Latitude" />
+                      <Input type="number" step="any" value={form.lng} onChange={(e) => setForm({ ...form, lng: e.target.value })} required placeholder="Longitude" />
                     </div>
+                    <p className="text-xs text-muted-foreground mt-1">Tap "Use My Live Location" to auto-fill from GPS</p>
                   </div>
                   <div>
                     <label className="text-sm font-medium text-foreground mb-1 block">Amenities (comma-separated)</label>

@@ -41,10 +41,10 @@ const Navbar = () => {
                 </Link>
               );
             })}
-            {isAdmin && (
+            {user && (
               <Link to="/admin">
                 <Button variant={location.pathname === "/admin" ? "default" : "ghost"} size="sm" className={location.pathname === "/admin" ? "" : "text-muted-foreground hover:text-foreground"}>
-                  <LayoutDashboard className="w-4 h-4 mr-1.5" />Dashboard
+                  <LayoutDashboard className="w-4 h-4 mr-1.5" />{isAdmin ? "Dashboard" : "List House"}
                 </Button>
               </Link>
             )}
@@ -91,10 +91,10 @@ const Navbar = () => {
                   </Link>
                 );
               })}
-              {isAdmin && (
+              {user && (
                 <Link to="/admin" onClick={() => setMobileOpen(false)}>
                   <Button variant={location.pathname === "/admin" ? "default" : "ghost"} className="w-full justify-start">
-                    <LayoutDashboard className="w-4 h-4 mr-2" />Dashboard
+                    <LayoutDashboard className="w-4 h-4 mr-2" />{isAdmin ? "Dashboard" : "List My House"}
                   </Button>
                 </Link>
               )}
