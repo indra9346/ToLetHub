@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { Tables, TablesInsert, TablesUpdate } from "@/integrations/supabase/types";
+import { cacheHouses, getCachedHouses } from "./useOfflineCache";
 
 export type House = Tables<"houses">;
 export type HouseInsert = TablesInsert<"houses">;
@@ -16,28 +17,65 @@ export const useHouses = (filters?: {
   return useQuery({
     queryKey: ["houses", filters],
     queryFn: async () => {
-      let query = supabase.from("houses").select("*").order("created_at", { ascending: false });
+      try {
+        let query = supabase.from("houses").select("*").order("created_at", { ascending: false });
 
-      if (filters?.status && filters.status !== "all") {
-        query = query.eq("status", filters.status);
-      }
-      if (filters?.minRent) {
-        query = query.gte("rent", filters.minRent);
-      }
-      if (filters?.maxRent) {
-        query = query.lte("rent", filters.maxRent);
-      }
-      if (filters?.rooms && filters.rooms > 0) {
-        query = query.eq("rooms", filters.rooms);
-      }
-      if (filters?.search) {
-        query = query.or(`title.ilike.%${filters.search}%,address.ilike.%${filters.search}%`);
-      }
+        if (filters?.status && filters.status !== "all") {
+          query = query.eq("status", filters.status);
+        }
+        if (filters?.minRent) {
+          query = query.gte("rent", filters.minRent);
+        }
+        if (filters?.maxRent) {
+          query = query.lte("rent", filters.maxRent);
+        }
+        if (filters?.rooms && filters.rooms > 0) {
+          query = query.eq("rooms", filters.rooms);
+        }
+        if (filters?.search) {
+          query = query.or(`title.ilike.%${filters.search}%,address.ilike.%${filters.search}%`);
+        }
 
-      const { data, error } = await query;
-      if (error) throw error;
-      return data;
+        const { data, error } = await query;
+        if (error) throw error;
+
+        // Cache all houses for offline use
+        if (data && data.length > 0) {
+          cacheHouses(data);
+        }
+        return data;
+      } catch (err) {
+        // If offline, return cached data
+        if (!navigator.onLine) {
+          const cached = await getCachedHouses();
+          if (cached.length > 0) {
+            // Apply client-side filters on cached data
+            let filtered = cached;
+            if (filters?.status && filters.status !== "all") {
+              filtered = filtered.filter((h) => h.status === filters.status);
+            }
+            if (filters?.minRent) {
+              filtered = filtered.filter((h) => h.rent >= filters.minRent!);
+            }
+            if (filters?.maxRent) {
+              filtered = filtered.filter((h) => h.rent <= filters.maxRent!);
+            }
+            if (filters?.rooms && filters.rooms > 0) {
+              filtered = filtered.filter((h) => h.rooms === filters.rooms);
+            }
+            if (filters?.search) {
+              const s = filters.search.toLowerCase();
+              filtered = filtered.filter(
+                (h) => h.title.toLowerCase().includes(s) || h.address.toLowerCase().includes(s)
+              );
+            }
+            return filtered as House[];
+          }
+        }
+        throw err;
+      }
     },
+    retry: navigator.onLine ? 3 : 0,
   });
 };
 
