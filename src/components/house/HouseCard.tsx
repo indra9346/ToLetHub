@@ -1,9 +1,11 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { MapPin, Bed, Bath, Heart, IndianRupee } from "lucide-react";
-import { useState } from "react";
-import type { House } from "@/data/mockHouses";
+import type { House } from "@/hooks/useHouses";
 import { Badge } from "@/components/ui/badge";
+import { useAuth } from "@/hooks/useAuth";
+import { useFavoriteIds, useToggleFavorite } from "@/hooks/useFavorites";
+import { toast } from "sonner";
 
 interface HouseCardProps {
   house: House;
@@ -11,19 +13,22 @@ interface HouseCardProps {
 }
 
 const HouseCard = ({ house, index = 0 }: HouseCardProps) => {
-  const [isFav, setIsFav] = useState(() => {
-    const favs = JSON.parse(localStorage.getItem("favorites") || "[]");
-    return favs.includes(house.id);
-  });
+  const { user } = useAuth();
+  const { data: favIds } = useFavoriteIds();
+  const toggleFav = useToggleFavorite();
+  const isFav = favIds?.includes(house.id) ?? false;
 
-  const toggleFav = (e: React.MouseEvent) => {
+  const handleToggleFav = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    const favs: string[] = JSON.parse(localStorage.getItem("favorites") || "[]");
-    const updated = isFav ? favs.filter((f) => f !== house.id) : [...favs, house.id];
-    localStorage.setItem("favorites", JSON.stringify(updated));
-    setIsFav(!isFav);
+    if (!user) {
+      toast.info("Sign in to save favorites");
+      return;
+    }
+    toggleFav.mutate({ houseId: house.id, isFav });
   };
+
+  const imageUrl = house.images?.[0] || "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800";
 
   return (
     <motion.div
@@ -35,14 +40,14 @@ const HouseCard = ({ house, index = 0 }: HouseCardProps) => {
         <div className="bg-card rounded-xl overflow-hidden card-shadow hover:card-shadow-hover transition-all duration-300 group-hover:-translate-y-1">
           <div className="relative aspect-[4/3] overflow-hidden">
             <img
-              src={house.images[0]}
+              src={imageUrl}
               alt={house.title}
               className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
               loading="lazy"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-foreground/40 to-transparent" />
             <button
-              onClick={toggleFav}
+              onClick={handleToggleFav}
               className="absolute top-3 right-3 w-9 h-9 rounded-full glass flex items-center justify-center transition-transform hover:scale-110"
             >
               <Heart
@@ -76,14 +81,12 @@ const HouseCard = ({ house, index = 0 }: HouseCardProps) => {
               <span className="flex items-center gap-1">
                 <Bath className="w-3.5 h-3.5" /> {house.bathrooms} Bath
               </span>
-              <span>{house.area} sq.ft</span>
+              {house.area && <span>{house.area} sq.ft</span>}
             </div>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center text-primary font-display font-bold text-lg">
-                <IndianRupee className="w-4 h-4" />
-                {house.rent.toLocaleString("en-IN")}
-                <span className="text-muted-foreground text-sm font-normal ml-1">/mo</span>
-              </div>
+            <div className="flex items-center text-primary font-display font-bold text-lg">
+              <IndianRupee className="w-4 h-4" />
+              {Number(house.rent).toLocaleString("en-IN")}
+              <span className="text-muted-foreground text-sm font-normal ml-1">/mo</span>
             </div>
           </div>
         </div>
