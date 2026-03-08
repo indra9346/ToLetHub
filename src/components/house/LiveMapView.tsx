@@ -98,8 +98,8 @@ const LiveMapView = ({
           <>
             <Circle
               center={[userPosition.lat, userPosition.lng]}
-              radius={100}
-              pathOptions={{ fillColor: "#3b82f6", fillOpacity: 0.1, color: "#3b82f6", weight: 1 }}
+              radius={30}
+              pathOptions={{ fillColor: "#3b82f6", fillOpacity: 0.08, color: "#3b82f6", weight: 1.5, dashArray: "4" }}
             />
             <Marker position={[userPosition.lat, userPosition.lng]} icon={userIcon}>
               <Popup>
