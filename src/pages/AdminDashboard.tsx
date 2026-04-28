@@ -44,7 +44,7 @@ const emptyForm: {
 };
 
 const AdminDashboard = () => {
-  const { user, isAdmin, signOut } = useAuth();
+  const { user, isAdmin, loading, signOut } = useAuth();
   const navigate = useNavigate();
   const { data: myHouses, isLoading } = useMyHouses(user?.id);
   const createHouse = useCreateHouse();
@@ -55,30 +55,7 @@ const AdminDashboard = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [videoFiles, setVideoFiles] = useState<File[]>([]);
-  const [promoting, setPromoting] = useState(false);
   const [gettingLocation, setGettingLocation] = useState(false);
-
-  // Self-promote to owner/admin
-  const handleBecomeOwner = async () => {
-    if (!user) return;
-    setPromoting(true);
-    try {
-      const { error } = await supabase.from("user_roles").insert({
-        user_id: user.id,
-        role: "admin" as any,
-      });
-      if (error && error.code !== "23505") {
-        toast.error("Failed to register: " + error.message);
-        setPromoting(false);
-        return;
-      }
-      toast.success("🎉 You're now a house owner! Refreshing...");
-      window.location.reload();
-    } catch (err: any) {
-      toast.error("Something went wrong. Please try again.");
-      setPromoting(false);
-    }
-  };
 
   // Get live GPS location
   const handleGetLiveLocation = () => {
@@ -105,6 +82,15 @@ const AdminDashboard = () => {
     );
   };
 
+  // Wait for auth + role to finish loading before deciding access
+  if (loading) {
+    return (
+      <div className="min-h-screen pt-20 flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
   if (!user) {
     return (
       <div className="min-h-screen pt-20 flex items-center justify-center">
@@ -122,19 +108,22 @@ const AdminDashboard = () => {
     return (
       <div className="min-h-screen pt-20 flex items-center justify-center">
         <div className="text-center max-w-md">
-          <Building2 className="w-14 h-14 text-primary mx-auto mb-4" />
-          <h3 className="font-display text-2xl font-bold text-foreground mb-2">Become a House Owner</h3>
+          <Building2 className="w-14 h-14 text-destructive mx-auto mb-4" />
+          <h3 className="font-display text-2xl font-bold text-foreground mb-2">Access Restricted</h3>
           <p className="text-muted-foreground mb-6">
-            Want to list your property on ToLetHub? Register as an owner to add your house details, 
-            upload room photos, and share your live location with potential tenants.
+            The Admin Dashboard is only available to registered house owners.
+            You're signed in as a tenant — you can browse listings, save favorites,
+            and navigate to homes, but you cannot list or manage properties.
           </p>
-          <Button onClick={handleBecomeOwner} disabled={promoting} className="gap-2" size="lg">
-            {promoting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Building2 className="w-4 h-4" />}
-            {promoting ? "Setting up..." : "Register as House Owner"}
-          </Button>
-          <p className="text-xs text-muted-foreground mt-4">
-            You'll be able to add houses, upload images, and manage listings.
+          <p className="text-sm text-muted-foreground mb-6">
+            To list a house, sign out and create a new account choosing
+            <span className="font-semibold text-foreground"> "House Owner" </span>
+            during sign up.
           </p>
+          <div className="flex gap-2 justify-center">
+            <Button variant="outline" onClick={() => navigate("/listings")}>Browse Houses</Button>
+            <Button onClick={async () => { await signOut(); navigate("/auth"); }}>Sign Out</Button>
+          </div>
         </div>
       </div>
     );
