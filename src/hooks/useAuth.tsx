@@ -26,17 +26,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   useEffect(() => {
-    // Restore session first
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        checkAdmin(session.user.id);
-      }
-      setLoading(false);
-    });
-
-    // Listen for changes — do NOT await inside callback
+    // Single listener — fires immediately with INITIAL_SESSION, avoids double load
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (_event, session) => {
         setSession(session);
@@ -49,6 +39,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setLoading(false);
       }
     );
+
+    // Safety: also fetch current session in case listener is slow
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession((prev) => prev ?? session);
+      setUser((prev) => prev ?? session?.user ?? null);
+      setLoading(false);
+    });
 
     return () => subscription.unsubscribe();
   }, [checkAdmin]);
