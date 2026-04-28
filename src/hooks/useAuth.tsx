@@ -7,7 +7,7 @@ interface AuthContextType {
   session: Session | null;
   loading: boolean;
   isAdmin: boolean;
-  signUp: (email: string, password: string, fullName: string) => Promise<{ error: any }>;
+  signUp: (email: string, password: string, fullName: string, role?: "tenant" | "owner") => Promise<{ error: any }>;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
 }
@@ -50,20 +50,48 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return () => subscription.unsubscribe();
   }, [checkAdmin]);
 
-  const signUp = async (email: string, password: string, fullName: string) => {
-    const { error } = await supabase.auth.signUp({
+  const signUp = async (email: string, password: string, fullName: string, role: "tenant" | "owner" = "tenant") => {
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        data: { full_name: fullName },
+        data: { full_name: fullName, intended_role: role },
         emailRedirectTo: window.location.origin,
       },
     });
+    // If owner signup AND we have a session immediately (auto-confirm on),
+    // grant the admin (owner) role right away. Otherwise stash it for first sign-in.
+    if (!error && role === "owner") {
+      try {
+        if (data.session?.user?.id) {
+          await supabase.from("user_roles").insert({
+            user_id: data.session.user.id,
+            role: "admin" as any,
+          });
+        } else {
+          localStorage.setItem("pending_owner_role", "1");
+        }
+      } catch {
+        localStorage.setItem("pending_owner_role", "1");
+      }
+    }
     return { error };
   };
 
   const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    // Apply pending owner role if signup happened before email confirm
+    if (!error && data.user && localStorage.getItem("pending_owner_role") === "1") {
+      try {
+        await supabase.from("user_roles").insert({
+          user_id: data.user.id,
+          role: "admin" as any,
+        });
+      } catch {
+        // ignore duplicates
+      }
+      localStorage.removeItem("pending_owner_role");
+    }
     return { error };
   };
 
