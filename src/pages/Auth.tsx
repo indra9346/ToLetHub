@@ -73,7 +73,15 @@ const Auth = () => {
       });
       if (result?.error) {
         const msg = typeof result.error === "string" ? result.error : result.error?.message || "Google sign-in failed";
-        toast.error(msg);
+        const isVendorError = /vendor|provider/i.test(msg);
+        const isPreview = window.location.hostname.includes("id-preview--");
+        if (isVendorError && isPreview) {
+          toast.error("Google sign-in is restricted in preview. Please use the Published URL or sign in with email.", {
+            duration: 6000,
+          });
+        } else {
+          toast.error(msg);
+        }
       }
     } catch (err: any) {
       toast.error(err?.message || "Google sign-in failed. Please try email sign-in.");
