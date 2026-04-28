@@ -41,7 +41,7 @@ const Auth = () => {
     setSubmitting(true);
     try {
       if (isSignUp) {
-        const { error } = await signUp(email, password, name);
+        const { error } = await signUp(email, password, name, role);
         if (error) {
           const m = error.message || "";
           if (/already registered|already exists|user already/i.test(m)) {
