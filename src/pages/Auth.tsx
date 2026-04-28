@@ -43,18 +43,36 @@ const Auth = () => {
       if (isSignUp) {
         const { error } = await signUp(email, password, name);
         if (error) {
-          toast.error(error.message);
+          const m = error.message || "";
+          if (/already registered|already exists|user already/i.test(m)) {
+            toast.error("This email is already registered. Switching to Sign In…", { duration: 4000 });
+            setIsSignUp(false);
+            setPassword("");
+          } else if (/password/i.test(m) && /6|short|weak/i.test(m)) {
+            toast.error("Password must be at least 6 characters.");
+          } else {
+            toast.error(m || "Sign up failed. Please try again.");
+          }
         } else {
           if (role === "owner") {
-            toast.success("Account created! You can now list your properties from the Dashboard.");
+            toast.success("Account created! Check your email to verify, then sign in.", { duration: 6000 });
           } else {
-            toast.success("Account created! You can now browse and save houses.");
+            toast.success("Account created! Check your email to verify, then sign in.", { duration: 6000 });
           }
+          setIsSignUp(false);
+          setPassword("");
         }
       } else {
         const { error } = await signIn(email, password);
         if (error) {
-          toast.error(error.message);
+          const m = error.message || "";
+          if (/invalid login|invalid credentials/i.test(m)) {
+            toast.error("Wrong email or password. Please try again.");
+          } else if (/email not confirmed/i.test(m)) {
+            toast.error("Please verify your email first — check your inbox.", { duration: 6000 });
+          } else {
+            toast.error(m || "Sign in failed. Please try again.");
+          }
         } else {
           toast.success("Welcome back!");
           navigate("/listings");
