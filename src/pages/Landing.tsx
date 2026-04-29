@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Search, MapPin, Shield, Zap, ArrowRight } from "lucide-react";
+import { Search, MapPin, Shield, Sparkles, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import heroImage from "@/assets/hero-building.jpg";
 import HouseCard from "@/components/house/HouseCard";
@@ -12,7 +12,7 @@ const features = [
   { icon: Search, title: "Smart Search", desc: "Find your perfect home with powerful filters for rent, location, rooms, and amenities." },
   { icon: MapPin, title: "Live Map View", desc: "See all available houses on an interactive map with real-time location data." },
   { icon: Shield, title: "Verified Listings", desc: "Every property is verified by owners with genuine photos and accurate details." },
-  { icon: Zap, title: "Works Offline", desc: "Browse cached listings even without internet. Data syncs automatically when you reconnect." },
+  { icon: Sparkles, title: "Live GPS Navigation", desc: "Track your route to any property in real-time with turn-by-turn directions." },
 ];
 
 const Landing = () => {
@@ -31,13 +31,13 @@ const Landing = () => {
         <div className="container mx-auto px-4 relative z-10 pt-16">
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }} className="max-w-2xl">
             <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }} className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-primary/30 bg-primary/10 text-sm mb-6" style={{ color: "hsl(220 10% 80%)" }}>
-              <Zap className="w-3.5 h-3.5" /> Now with offline support
+              <Sparkles className="w-3.5 h-3.5" /> Trusted rentals, verified owners
             </motion.div>
             <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight mb-6" style={{ color: "hsl(0 0% 100%)" }}>
               Find Your Perfect<br /><span className="text-gradient">Rental Home</span>
             </h1>
             <p className="text-lg sm:text-xl mb-8 leading-relaxed" style={{ color: "hsl(220 10% 80%)" }}>
-              Discover thousands of verified rental properties on an interactive map. Browse, filter, and connect with owners — even offline.
+              Discover thousands of verified rental properties on an interactive map. Browse, filter, and connect with owners instantly.
             </p>
             <div className="flex flex-col sm:flex-row gap-3">
               <Link to="/listings"><Button size="lg" className="text-base px-8 gap-2"><Search className="w-5 h-5" />Browse Houses</Button></Link>

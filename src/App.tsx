@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
 import Navbar from "@/components/layout/Navbar";
 import OnlineStatus from "@/components/layout/OnlineStatus";
+import SplashIntro from "@/components/layout/SplashIntro";
 import Landing from "./pages/Landing";
 import Listings from "./pages/Listings";
 import HouseDetail from "./pages/HouseDetail";
@@ -34,6 +35,7 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
+          <SplashIntro />
           <Navbar />
           <OnlineStatus />
           <Routes>
