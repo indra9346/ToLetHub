@@ -1,16 +1,20 @@
-import { useState, useMemo, useEffect, useCallback } from "react";
+import { useState, useMemo, useEffect, useCallback, lazy, Suspense } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link, useSearchParams } from "react-router-dom";
 import {
   Loader2, LocateFixed, Navigation, X, MapPin, IndianRupee,
-  Bed, ArrowRight, Route, Clock, Compass
+  Bed, ArrowRight, Route, Clock, Compass, Globe2
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import LiveMapView from "@/components/house/LiveMapView";
+import { Slider } from "@/components/ui/slider";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useHouses, type House } from "@/hooks/useHouses";
 import { useGeolocation, getDistanceKm } from "@/hooks/useGeolocation";
 import { toast } from "sonner";
+
+// Code-split the Leaflet map (heavy: leaflet + react-leaflet bundles)
+const LiveMapView = lazy(() => import("@/components/house/LiveMapView"));
 
 interface NearbyHouse extends House {
   distance: number;
@@ -27,6 +31,7 @@ const MapPage = () => {
   const [routeInfo, setRouteInfo] = useState<{ distance: string; duration: string } | null>(null);
   const [showNearby, setShowNearby] = useState(!navigateToId);
   const [autoNavTriggered, setAutoNavTriggered] = useState(false);
+  const [radiusKm, setRadiusKm] = useState(25);
 
   // Start tracking on mount
   useEffect(() => {
@@ -34,7 +39,7 @@ const MapPage = () => {
     return () => geo.stopTracking();
   }, []);
 
-  // Calculate nearby houses sorted by distance
+  // All houses sorted by distance (for sidebar list, top 10)
   const nearbyHouses = useMemo<NearbyHouse[]>(() => {
     if (!geo.position || !houses) return [];
     return houses
@@ -45,6 +50,21 @@ const MapPage = () => {
       .sort((a, b) => a.distance - b.distance)
       .slice(0, 10);
   }, [geo.position, houses]);
+
+  // Houses strictly within the chosen radius (for empty-state logic)
+  const housesWithinRadius = useMemo<NearbyHouse[]>(() => {
+    if (!geo.position || !houses) return [];
+    return houses
+      .map((h) => ({
+        ...h,
+        distance: getDistanceKm(geo.position!.lat, geo.position!.lng, h.lat, h.lng),
+      }))
+      .filter((h) => h.distance <= radiusKm)
+      .sort((a, b) => a.distance - b.distance);
+  }, [geo.position, houses, radiusKm]);
+
+  const noListingsNearby =
+    !!geo.position && !isLoading && (houses?.length ?? 0) > 0 && housesWithinRadius.length === 0;
 
   // Auto-navigate to a house when coming from HouseDetail "Confirm & Navigate"
   useEffect(() => {
@@ -175,29 +195,92 @@ const MapPage = () => {
         <div className="grid lg:grid-cols-3 gap-4">
           {/* Map */}
           <div className="lg:col-span-2">
-            <LiveMapView
-              houses={(houses ?? []) as any}
-              userPosition={geo.position}
-              className="h-[calc(100vh-200px)]"
-              selectedHouseId={selectedHouseId}
-              onSelectHouse={(id) => {
-                if (id && geo.position) {
-                  const house = nearbyHouses.find((h) => h.id === id);
-                  if (house) handleNavigate(house);
-                  else {
-                    const h = houses?.find((h) => h.id === id);
-                    if (h) {
-                      const nh: NearbyHouse = {
-                        ...h,
-                        distance: getDistanceKm(geo.position.lat, geo.position.lng, h.lat, h.lng),
-                      };
-                      handleNavigate(nh);
+            <Suspense
+              fallback={
+                <Skeleton className="h-[calc(100vh-200px)] w-full rounded-xl flex items-center justify-center">
+                  <div className="flex flex-col items-center gap-2 text-muted-foreground">
+                    <Loader2 className="w-6 h-6 animate-spin text-primary" />
+                    <span className="text-sm">Loading map…</span>
+                  </div>
+                </Skeleton>
+              }
+            >
+              <LiveMapView
+                houses={(houses ?? []) as any}
+                userPosition={geo.position}
+                className="h-[calc(100vh-200px)]"
+                selectedHouseId={selectedHouseId}
+                onSelectHouse={(id) => {
+                  if (id && geo.position) {
+                    const house = nearbyHouses.find((h) => h.id === id);
+                    if (house) handleNavigate(house);
+                    else {
+                      const h = houses?.find((h) => h.id === id);
+                      if (h) {
+                        const nh: NearbyHouse = {
+                          ...h,
+                          distance: getDistanceKm(geo.position.lat, geo.position.lng, h.lat, h.lng),
+                        };
+                        handleNavigate(nh);
+                      }
                     }
                   }
-                }
-              }}
-              routePoints={routePoints}
-            />
+                }}
+                routePoints={routePoints}
+              />
+            </Suspense>
+
+            {/* "No listings within X km" empty state */}
+            <AnimatePresence>
+              {noListingsNearby && !navigatingToHouse && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0 }}
+                  className="mt-3 bg-card rounded-xl p-5 card-shadow"
+                >
+                  <div className="flex items-start gap-3">
+                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                      <Globe2 className="w-5 h-5 text-primary" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-display font-semibold text-foreground mb-1">
+                        No vacant houses within {radiusKm} km of you
+                      </h3>
+                      <p className="text-sm text-muted-foreground mb-3">
+                        We have {houses?.length ?? 0} listings worldwide, just none in your radius yet.
+                        Try expanding the search area or browse all listings.
+                      </p>
+                      <div className="flex items-center gap-3 mb-3">
+                        <span className="text-xs text-muted-foreground whitespace-nowrap">
+                          Radius: {radiusKm} km
+                        </span>
+                        <Slider
+                          min={5}
+                          max={500}
+                          step={5}
+                          value={[radiusKm]}
+                          onValueChange={(v) => setRadiusKm(v[0])}
+                          className="flex-1"
+                        />
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => setRadiusKm(Math.min(500, radiusKm * 2))}
+                        >
+                          Expand to {Math.min(500, radiusKm * 2)} km
+                        </Button>
+                        <Link to="/listings">
+                          <Button size="sm">Browse All Listings</Button>
+                        </Link>
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
 
             {/* Navigation bar */}
             <AnimatePresence>
