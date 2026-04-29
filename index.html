@@ -1,32 +1,136 @@
 <!doctype html>
 <html lang="en">
-  <head>
+<head>
+    <!-- Basic -->
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
-    <title>ToLetHub - Find Your Perfect Rental Home</title>
-    <meta name="description" content="Discover verified rental houses on an interactive map. Browse, filter by rent, location & amenities, and connect with owners instantly." />
+    
+    <!-- Primary SEO -->
+    <title>
+        ToLetHub | House for Rent Near Me | Flats, Apartments & Verified Rental Homes
+    </title>
+
+    <meta 
+        name="description" 
+        content="Find verified rental homes, flats, apartments, PGs, villas and independent houses near you using ToLetHub. Browse listings, use interactive maps, live GPS navigation, smart filters and connect directly with owners."
+    />
+
+    <meta 
+        name="keywords"
+        content="
+        house for rent near me,
+        flats for rent,
+        apartments for rent,
+        rental homes India,
+        rental houses Bangalore,
+        rental houses Chickballapur,
+        verified rental homes,
+        owner listed properties,
+        rental platform India,
+        property finder,
+        affordable homes for rent,
+        PG rooms near me,
+        villa rentals,
+        independent house rent,
+        map based house search,
+        live GPS rental navigation,
+        ToLetHub
+        "
+    />
+
     <meta name="author" content="ToLetHub" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <meta name="googlebot" content="index, follow" />
+    <meta name="bingbot" content="index, follow" />
+
+    <!-- Canonical -->
+    <link rel="canonical" href="https://tolethub.app/" />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+
+    <!-- Theme -->
     <meta name="theme-color" content="#e8572a" />
-    <link rel="canonical" href="https://tolethub.app" />
+    <meta name="msapplication-TileColor" content="#e8572a" />
 
-    <meta property="og:title" content="ToLetHub - Find Your Perfect Rental Home" />
-    <meta property="og:description" content="Browse thousands of verified rental properties with live map view and real-time GPS navigation." />
+    <!-- Geo SEO -->
+    <meta name="geo.region" content="IN-KA" />
+    <meta name="geo.placename" content="Bangalore, Karnataka, India" />
+    <meta name="geo.position" content="12.9716;77.5946" />
+    <meta name="ICBM" content="12.9716,77.5946" />
+
+    <!-- Open Graph -->
     <meta property="og:type" content="website" />
-    <meta property="og:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
+    <meta property="og:site_name" content="ToLetHub" />
+    <meta property="og:title" content="ToLetHub - Find Verified Rental Homes Near You" />
+    <meta property="og:description" content="Search houses, flats, PGs and apartments for rent using smart filters, interactive maps and verified owner listings." />
+    <meta property="og:url" content="https://tolethub.app/" />
+    <meta property="og:image" content="https://tolethub.app/og-image.png" />
 
+    <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="ToLetHub - Find Your Perfect Rental Home" />
-    <meta name="twitter:description" content="Browse verified rental houses on an interactive map with live navigation." />
-    <meta name="twitter:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
+    <meta name="twitter:title" content="ToLetHub - Rental Homes Platform" />
+    <meta name="twitter:description" content="Find rental houses instantly with verified listings and map navigation." />
+    <meta name="twitter:image" content="https://tolethub.app/og-image.png" />
 
-    <link rel="apple-touch-icon" href="/pwa-192x192.png" />
+    <!-- Mobile App -->
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" crossorigin="" />
-  </head>
+    <meta name="apple-mobile-web-app-title" content="ToLetHub" />
 
-  <body>
+    <!-- Search Verification -->
+    <meta name="google-site-verification" content="YOUR_GOOGLE_VERIFICATION_CODE" />
+    <meta name="msvalidate.01" content="YOUR_BING_VERIFICATION_CODE" />
+
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "RealEstateAgent",
+      "name": "ToLetHub",
+      "url": "https://tolethub.app/",
+      "logo": "https://tolethub.app/logo.png",
+      "description": "Find verified rental houses, flats, apartments and PGs with live map navigation.",
+      "areaServed": [
+        "Bangalore",
+        "Chickballapur",
+        "India"
+      ],
+      "sameAs": [
+        "https://www.linkedin.com/",
+        "https://www.instagram.com/"
+      ]
+    }
+    </script>
+
+    <!-- Rental Listings Schema -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "ToLetHub",
+      "url": "https://tolethub.app/",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://tolethub.app/search?q={search_term_string}",
+        "query-input": "required name=search_term_string"
+      }
+    }
+    </script>
+
+    <!-- Leaflet -->
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"
+        crossorigin=""
+    />
+</head>
+
+<body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
-  </body>
+</body>
 </html>
