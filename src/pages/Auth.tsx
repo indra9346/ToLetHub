@@ -104,22 +104,25 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 pt-16 pb-24 md:pb-8">
+    <div className="min-h-screen flex items-center justify-center px-4 pt-16 pb-24 md:pb-8 relative overflow-hidden">
+      {/* Ambient gradient orbs */}
+      <div className="pointer-events-none absolute -top-40 -left-40 w-[500px] h-[500px] rounded-full bg-primary/20 blur-3xl" />
+      <div className="pointer-events-none absolute -bottom-40 -right-40 w-[500px] h-[500px] rounded-full bg-accent/20 blur-3xl" />
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-md"
+        className="w-full max-w-md relative z-10"
       >
         <div className="text-center mb-8">
           <Link to="/" className="inline-flex items-center gap-2 mb-6">
-            <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center">
+            <div className="w-10 h-10 rounded-xl gradient-primary flex items-center justify-center glow-primary">
               <Home className="w-5 h-5 text-primary-foreground" />
             </div>
             <span className="font-display font-bold text-2xl text-foreground">
               ToLet<span className="text-primary">Hub</span>
             </span>
           </Link>
-          <h1 className="font-display text-2xl font-bold text-foreground">
+          <h1 className="font-display text-3xl font-bold text-foreground">
             {isSignUp ? "Create your account" : "Welcome back"}
           </h1>
           <p className="text-muted-foreground mt-1">
@@ -127,7 +130,7 @@ const Auth = () => {
           </p>
         </div>
 
-        <div className="bg-card rounded-2xl p-6 sm:p-8 card-shadow">
+        <div className="glass-strong rounded-3xl p-6 sm:p-8 card-shadow">
           {/* Role selector for signup */}
           {isSignUp && (
             <div className="mb-6">
