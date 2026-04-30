@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
-import { lovable } from "@/integrations/lovable/index";
+import { supabase } from "@/integrations/supabase/client";
 
 const Auth = () => {
   const [searchParams] = useSearchParams();
@@ -86,21 +86,16 @@ const Auth = () => {
   const handleGoogleSignIn = async () => {
     setGoogleLoading(true);
     try {
-      const result: any = await lovable.auth.signInWithOAuth("google", {
-        redirect_uri: window.location.origin,
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: `${window.location.origin}/listings`,
+        },
       });
-      if (result?.error) {
-        const msg = typeof result.error === "string" ? result.error : result.error?.message || "Google sign-in failed";
-        const isVendorError = /vendor|provider/i.test(msg);
-        const isPreview = window.location.hostname.includes("id-preview--");
-        if (isVendorError && isPreview) {
-          toast.error("Google sign-in is restricted in preview. Please use the Published URL or sign in with email.", {
-            duration: 6000,
-          });
-        } else {
-          toast.error(msg);
-        }
+      if (error) {
+        toast.error(error.message || "Google sign-in failed");
       }
+      // On success the browser will redirect to Google, no further action needed.
     } catch (err: any) {
       toast.error(err?.message || "Google sign-in failed. Please try email sign-in.");
     } finally {
