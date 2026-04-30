@@ -19,10 +19,10 @@ const Navbar = () => {
 
   return (
     <>
-      <nav className="fixed top-0 left-0 right-0 z-50 glass border-b border-border/50">
+      <nav className="fixed top-0 left-0 right-0 z-50 glass-strong border-b border-border/40">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
+            <div className="w-9 h-9 rounded-xl gradient-primary flex items-center justify-center glow-primary">
               <Home className="w-4 h-4 text-primary-foreground" />
             </div>
             <span className="font-display font-bold text-xl text-foreground">
@@ -79,7 +79,7 @@ const Navbar = () => {
 
       <AnimatePresence>
         {mobileOpen && (
-          <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="fixed top-16 left-0 right-0 z-40 glass border-b border-border/50 md:hidden">
+          <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="fixed top-16 left-0 right-0 z-40 glass-strong border-b border-border/40 md:hidden">
             <div className="p-4 flex flex-col gap-1">
               {navItems.map((item) => {
                 const isActive = location.pathname === item.path;
@@ -123,7 +123,7 @@ const Navbar = () => {
       </AnimatePresence>
 
       {/* Mobile Bottom Nav */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 glass border-t border-border/50 md:hidden">
+      <div className="fixed bottom-0 left-0 right-0 z-50 glass-strong border-t border-border/40 md:hidden">
         <div className="flex items-center justify-around py-2">
           {navItems.map((item) => {
             const isActive = location.pathname === item.path;
