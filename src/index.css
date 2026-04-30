@@ -2,91 +2,79 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Figtree:wght@300;400;500;600;700&display=swap');
 
 @layer base {
   :root {
-    --background: 220 20% 97%;
-    --foreground: 220 30% 10%;
+    /* Glass Mint — dark base, mint accents */
+    --background: 210 45% 6%;
+    --foreground: 160 25% 96%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 220 30% 10%;
+    --card: 210 40% 10%;
+    --card-foreground: 160 25% 96%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 220 30% 10%;
+    --popover: 210 45% 9%;
+    --popover-foreground: 160 25% 96%;
 
-    --primary: 12 80% 55%;
-    --primary-foreground: 0 0% 100%;
+    --primary: 165 75% 50%;
+    --primary-foreground: 210 45% 6%;
 
-    --secondary: 220 20% 94%;
-    --secondary-foreground: 220 30% 15%;
+    --secondary: 210 35% 14%;
+    --secondary-foreground: 160 20% 92%;
 
-    --muted: 220 15% 92%;
-    --muted-foreground: 220 10% 50%;
+    --muted: 210 30% 14%;
+    --muted-foreground: 165 15% 65%;
 
-    --accent: 220 60% 50%;
-    --accent-foreground: 0 0% 100%;
+    --accent: 150 80% 70%;
+    --accent-foreground: 210 45% 6%;
 
-    --destructive: 0 84% 60%;
+    --destructive: 0 75% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 220 15% 88%;
-    --input: 220 15% 88%;
-    --ring: 12 80% 55%;
+    --border: 165 25% 18%;
+    --input: 210 30% 14%;
+    --ring: 165 75% 50%;
 
-    --radius: 0.75rem;
+    --radius: 1rem;
 
-    --sidebar-background: 220 25% 12%;
-    --sidebar-foreground: 220 10% 90%;
-    --sidebar-primary: 12 80% 55%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 220 20% 18%;
-    --sidebar-accent-foreground: 220 10% 90%;
-    --sidebar-border: 220 20% 20%;
-    --sidebar-ring: 12 80% 55%;
+    --sidebar-background: 210 45% 6%;
+    --sidebar-foreground: 160 20% 90%;
+    --sidebar-primary: 165 75% 50%;
+    --sidebar-primary-foreground: 210 45% 6%;
+    --sidebar-accent: 210 35% 12%;
+    --sidebar-accent-foreground: 160 20% 90%;
+    --sidebar-border: 165 25% 16%;
+    --sidebar-ring: 165 75% 50%;
 
-    /* Custom tokens */
-    --surface: 220 20% 99%;
-    --surface-foreground: 220 30% 10%;
-    --success: 152 60% 42%;
-    --success-foreground: 0 0% 100%;
-    --warning: 38 92% 50%;
-    --warning-foreground: 0 0% 100%;
-    --hero-gradient: linear-gradient(135deg, hsl(220 30% 8%) 0%, hsl(220 40% 15%) 50%, hsl(12 60% 25%) 100%);
-    --card-shadow: 0 4px 24px -4px hsl(220 30% 10% / 0.08);
-    --card-shadow-hover: 0 12px 40px -8px hsl(220 30% 10% / 0.15);
-    --glass-bg: hsl(0 0% 100% / 0.8);
-    --glass-border: hsl(0 0% 100% / 0.3);
+    --surface: 210 40% 9%;
+    --surface-foreground: 160 25% 96%;
+    --success: 152 70% 50%;
+    --success-foreground: 210 45% 6%;
+    --warning: 38 95% 60%;
+    --warning-foreground: 210 45% 6%;
+
+    /* Gradients */
+    --hero-gradient: radial-gradient(ellipse at 20% 0%, hsl(165 75% 25% / 0.55) 0%, transparent 55%),
+                     radial-gradient(ellipse at 100% 100%, hsl(150 70% 40% / 0.35) 0%, transparent 60%),
+                     linear-gradient(135deg, hsl(210 45% 6%) 0%, hsl(165 50% 10%) 100%);
+    --gradient-primary: linear-gradient(135deg, hsl(165 75% 50%), hsl(150 80% 70%));
+    --gradient-mesh: radial-gradient(at 0% 0%, hsl(165 75% 50% / 0.18) 0%, transparent 50%),
+                     radial-gradient(at 100% 0%, hsl(150 80% 70% / 0.12) 0%, transparent 50%),
+                     radial-gradient(at 50% 100%, hsl(165 60% 40% / 0.15) 0%, transparent 50%);
+
+    /* Shadows + glass */
+    --card-shadow: 0 4px 24px -4px hsl(165 75% 30% / 0.15), 0 0 0 1px hsl(165 25% 18% / 0.5);
+    --card-shadow-hover: 0 16px 48px -8px hsl(165 75% 50% / 0.25), 0 0 0 1px hsl(165 75% 50% / 0.3);
+    --glow-primary: 0 0 32px hsl(165 75% 50% / 0.4);
+    --glass-bg: hsl(210 40% 10% / 0.55);
+    --glass-border: hsl(165 75% 50% / 0.18);
+    --glass-bg-strong: hsl(210 40% 10% / 0.85);
   }
 
   .dark {
-    --background: 220 25% 6%;
-    --foreground: 220 10% 92%;
-    --card: 220 25% 10%;
-    --card-foreground: 220 10% 92%;
-    --popover: 220 25% 10%;
-    --popover-foreground: 220 10% 92%;
-    --primary: 12 80% 55%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 220 20% 15%;
-    --secondary-foreground: 220 10% 85%;
-    --muted: 220 20% 15%;
-    --muted-foreground: 220 10% 55%;
-    --accent: 220 60% 55%;
-    --accent-foreground: 0 0% 100%;
-    --destructive: 0 62% 30%;
-    --destructive-foreground: 0 0% 100%;
-    --border: 220 20% 18%;
-    --input: 220 20% 18%;
-    --ring: 12 80% 55%;
-    --sidebar-background: 220 25% 8%;
-    --sidebar-foreground: 220 10% 90%;
-    --sidebar-primary: 12 80% 55%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 220 20% 14%;
-    --sidebar-accent-foreground: 220 10% 90%;
-    --sidebar-border: 220 20% 14%;
-    --sidebar-ring: 12 80% 55%;
+    /* Same Glass Mint — already a dark theme */
+    --background: 210 45% 4%;
+    --card: 210 40% 8%;
   }
 }
 
@@ -97,11 +85,14 @@
 
   body {
     @apply bg-background text-foreground font-sans antialiased;
-    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-family: 'Figtree', system-ui, sans-serif;
+    background-image: var(--gradient-mesh);
+    background-attachment: fixed;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Space Grotesk', sans-serif;
+    font-family: 'Outfit', system-ui, sans-serif;
+    letter-spacing: -0.02em;
   }
 }
 
@@ -110,9 +101,25 @@
     background: var(--hero-gradient);
   }
 
+  .gradient-primary {
+    background: var(--gradient-primary);
+  }
+
+  .gradient-mesh {
+    background: var(--gradient-mesh);
+  }
+
   .glass {
     background: var(--glass-bg);
-    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid var(--glass-border);
+  }
+
+  .glass-strong {
+    background: var(--glass-bg-strong);
+    -webkit-backdrop-filter: blur(24px) saturate(200%);
+    backdrop-filter: blur(24px) saturate(200%);
     border: 1px solid var(--glass-border);
   }
 
@@ -124,10 +131,43 @@
     box-shadow: var(--card-shadow-hover);
   }
 
+  .glow-primary {
+    box-shadow: var(--glow-primary);
+  }
+
   .text-gradient {
-    background: linear-gradient(135deg, hsl(12 80% 55%), hsl(38 92% 50%));
+    background: linear-gradient(135deg, hsl(165 75% 55%), hsl(150 85% 75%));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+  }
+
+  /* Leaflet override — keep map inside its container, never overflow */
+  .leaflet-container {
+    background: hsl(210 45% 8%) !important;
+    font-family: 'Figtree', sans-serif !important;
+  }
+  .leaflet-control-zoom a,
+  .leaflet-bar a {
+    background: var(--glass-bg-strong) !important;
+    color: hsl(var(--foreground)) !important;
+    border-color: var(--glass-border) !important;
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+  }
+  .leaflet-control-zoom a:hover {
+    background: hsl(var(--primary) / 0.2) !important;
+    color: hsl(var(--primary)) !important;
+  }
+  .leaflet-popup-content-wrapper {
+    background: var(--glass-bg-strong) !important;
+    color: hsl(var(--foreground)) !important;
+    border-radius: 12px !important;
+    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+  }
+  .leaflet-popup-tip {
+    background: var(--glass-bg-strong) !important;
   }
 }
