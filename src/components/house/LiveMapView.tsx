@@ -3,7 +3,7 @@ import { MapContainer, TileLayer, Marker, Popup, useMap, Circle, Polyline } from
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { Link } from "react-router-dom";
-import { IndianRupee, Navigation, X, Clock, MapPin as MapPinIcon } from "lucide-react";
+import { IndianRupee, Navigation, X, Clock, MapPin as MapPinIcon, Plus, Minus, Layers } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getDistanceKm } from "@/hooks/useGeolocation";
 
@@ -17,14 +17,14 @@ L.Icon.Default.mergeOptions({
 
 const userIcon = L.divIcon({
   className: "user-location-marker",
-  html: `<div style="width:20px;height:20px;border-radius:50%;background:#3b82f6;border:3px solid white;box-shadow:0 0 10px rgba(59,130,246,0.5);"></div>`,
+  html: `<div style="position:relative;width:20px;height:20px;"><div style="position:absolute;inset:-8px;border-radius:50%;background:rgba(45,212,168,0.25);animation:pulse 2s ease-out infinite;"></div><div style="position:relative;width:20px;height:20px;border-radius:50%;background:#2dd4a8;border:3px solid white;box-shadow:0 0 12px rgba(45,212,168,0.7);"></div></div>`,
   iconSize: [20, 20],
   iconAnchor: [10, 10],
 });
 
 const houseIcon = L.divIcon({
   className: "house-marker",
-  html: `<div style="width:28px;height:28px;border-radius:50%;background:#e8572a;border:3px solid white;box-shadow:0 2px 8px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;color:white;font-size:14px;">🏠</div>`,
+  html: `<div style="width:32px;height:32px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:linear-gradient(135deg,#2dd4a8,#73ffb8);border:2px solid white;box-shadow:0 4px 12px rgba(45,212,168,0.5);display:flex;align-items:center;justify-content:center;"><div style="transform:rotate(45deg);font-size:14px;">🏠</div></div>`,
   iconSize: [28, 28],
   iconAnchor: [14, 14],
 });
@@ -81,21 +81,51 @@ const LiveMapView = ({
   routePoints,
 }: LiveMapViewProps) => {
   const [followUser, setFollowUser] = useState(true);
+  const [satellite, setSatellite] = useState(false);
+  const mapRef = useRef<L.Map | null>(null);
   const center: [number, number] = userPosition
     ? [userPosition.lat, userPosition.lng]
     : [12.9716, 77.5946];
 
   return (
-    <div className={`rounded-xl overflow-hidden border border-border relative ${className}`}>
-      <MapContainer center={center} zoom={14} className="w-full h-full" scrollWheelZoom zoomControl={false} attributionControl={false}>
-        <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          keepBuffer={2}
-          updateWhenIdle={true}
-          updateWhenZooming={false}
-          crossOrigin={true}
-        />
+    <div
+      className={`rounded-2xl overflow-hidden relative isolate ${className}`}
+      style={{ contain: "layout paint", boxShadow: "var(--card-shadow)" }}
+    >
+      <MapContainer
+        center={center}
+        zoom={14}
+        minZoom={3}
+        maxZoom={19}
+        className="w-full h-full"
+        scrollWheelZoom
+        zoomControl={false}
+        attributionControl={false}
+        zoomSnap={0.5}
+        zoomDelta={0.5}
+        wheelPxPerZoomLevel={80}
+        worldCopyJump
+        ref={(m) => { if (m) mapRef.current = m; }}
+      >
+        {satellite ? (
+          <TileLayer
+            attribution='&copy; Esri'
+            url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+            keepBuffer={2}
+            updateWhenIdle
+            updateWhenZooming={false}
+            crossOrigin
+          />
+        ) : (
+          <TileLayer
+            attribution='&copy; OpenStreetMap'
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            keepBuffer={2}
+            updateWhenIdle
+            updateWhenZooming={false}
+            crossOrigin
+          />
+        )}
 
         {/* User location */}
         {userPosition && (
@@ -176,11 +206,39 @@ const LiveMapView = ({
         })}
       </MapContainer>
 
-      {/* Recenter button */}
+      {/* Google-Maps style control stack — top-right */}
+      <div className="absolute top-3 right-3 z-[1000] flex flex-col gap-2">
+        <div className="glass-strong rounded-xl overflow-hidden flex flex-col">
+          <button
+            onClick={() => mapRef.current?.zoomIn(1, { animate: true })}
+            className="w-10 h-10 flex items-center justify-center hover:bg-primary/20 text-foreground transition-colors"
+            aria-label="Zoom in"
+          >
+            <Plus className="w-4 h-4" />
+          </button>
+          <div className="h-px bg-border/50" />
+          <button
+            onClick={() => mapRef.current?.zoomOut(1, { animate: true })}
+            className="w-10 h-10 flex items-center justify-center hover:bg-primary/20 text-foreground transition-colors"
+            aria-label="Zoom out"
+          >
+            <Minus className="w-4 h-4" />
+          </button>
+        </div>
+        <button
+          onClick={() => setSatellite((s) => !s)}
+          className="glass-strong rounded-xl w-10 h-10 flex items-center justify-center hover:bg-primary/20 transition-colors"
+          title={satellite ? "Switch to map" : "Switch to satellite"}
+        >
+          <Layers className="w-4 h-4 text-foreground" />
+        </button>
+      </div>
+
+      {/* Recenter — bottom-right */}
       {userPosition && (
         <button
           onClick={() => setFollowUser(true)}
-          className="absolute bottom-4 right-4 z-[1000] w-10 h-10 rounded-full bg-card shadow-lg border border-border flex items-center justify-center hover:bg-secondary transition-colors"
+          className="absolute bottom-4 right-4 z-[1000] w-11 h-11 rounded-full glass-strong flex items-center justify-center hover:glow-primary transition-all"
           title="Center on my location"
         >
           <Navigation className="w-4 h-4 text-primary" />

@@ -39,15 +39,15 @@ const HouseCard = ({ house, index = 0 }: HouseCardProps) => {
       transition={{ duration: 0.4, delay: index * 0.08 }}
     >
       <Link to={`/house/${house.id}`} className="group block">
-        <div className="bg-card rounded-xl overflow-hidden card-shadow hover:card-shadow-hover transition-all duration-300 group-hover:-translate-y-1">
+        <div className="glass rounded-2xl overflow-hidden card-shadow hover:card-shadow-hover transition-all duration-500 group-hover:-translate-y-2 group-hover:glow-primary">
           <div className="relative aspect-[4/3] overflow-hidden">
             <img
               src={imageUrl}
               alt={house.title}
-              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
               loading="lazy"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-foreground/40 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-transparent" />
             <button
               onClick={handleToggleFav}
               className="absolute top-3 right-3 w-9 h-9 rounded-full glass flex items-center justify-center transition-transform hover:scale-110"

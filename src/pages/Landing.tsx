@@ -25,29 +25,32 @@ const Landing = () => {
       {/* Hero */}
       <section className="relative min-h-[90vh] flex items-center overflow-hidden">
         <div className="absolute inset-0">
-          <img src={heroImage} alt="Modern apartment building" className="w-full h-full object-cover" />
-          <div className="absolute inset-0 hero-gradient opacity-85" />
+          <img src={heroImage} alt="Modern apartment building" className="w-full h-full object-cover opacity-30" />
+          <div className="absolute inset-0 hero-gradient" />
+          {/* Floating mint orbs */}
+          <div className="absolute top-1/4 -left-32 w-96 h-96 rounded-full bg-primary/30 blur-3xl animate-pulse" />
+          <div className="absolute bottom-1/4 -right-32 w-96 h-96 rounded-full bg-accent/20 blur-3xl" />
         </div>
         <div className="container mx-auto px-4 relative z-10 pt-16">
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }} className="max-w-2xl">
-            <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }} className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-primary/30 bg-primary/10 text-sm mb-6" style={{ color: "hsl(220 10% 80%)" }}>
+            <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }} className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass text-sm mb-6 text-foreground/90">
               <Sparkles className="w-3.5 h-3.5" /> Trusted rentals, verified owners
             </motion.div>
-            <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight mb-6" style={{ color: "hsl(0 0% 100%)" }}>
+            <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight mb-6 text-foreground">
               Find Your Perfect<br /><span className="text-gradient">Rental Home</span>
             </h1>
-            <p className="text-lg sm:text-xl mb-8 leading-relaxed" style={{ color: "hsl(220 10% 80%)" }}>
+            <p className="text-lg sm:text-xl mb-8 leading-relaxed text-foreground/75">
               Discover thousands of verified rental properties on an interactive map. Browse, filter, and connect with owners instantly.
             </p>
             <div className="flex flex-col sm:flex-row gap-3">
-              <Link to="/listings"><Button size="lg" className="text-base px-8 gap-2"><Search className="w-5 h-5" />Browse Houses</Button></Link>
-              <Link to="/map"><Button size="lg" variant="outline" className="text-base px-8 gap-2 border-white/30 bg-white/10 text-white hover:bg-white/20 hover:text-white"><MapPin className="w-5 h-5" />View on Map</Button></Link>
+              <Link to="/listings"><Button size="lg" className="text-base px-8 gap-2 glow-primary"><Search className="w-5 h-5" />Browse Houses</Button></Link>
+              <Link to="/map"><Button size="lg" variant="outline" className="text-base px-8 gap-2 glass border-primary/30 hover:bg-primary/10"><MapPin className="w-5 h-5" />View on Map</Button></Link>
             </div>
             <div className="flex gap-8 mt-12">
               {[{ label: "Properties", value: "1,200+" }, { label: "Cities", value: "25+" }, { label: "Happy Tenants", value: "5,000+" }].map((stat) => (
                 <div key={stat.label}>
-                  <div className="font-display text-2xl font-bold" style={{ color: "hsl(0 0% 100%)" }}>{stat.value}</div>
-                  <div className="text-sm" style={{ color: "hsl(220 10% 65%)" }}>{stat.label}</div>
+                  <div className="font-display text-2xl font-bold text-gradient">{stat.value}</div>
+                  <div className="text-sm text-muted-foreground">{stat.label}</div>
                 </div>
               ))}
             </div>
@@ -56,7 +59,7 @@ const Landing = () => {
       </section>
 
       {/* Features */}
-      <section className="py-20 bg-secondary/30">
+      <section className="py-20">
         <div className="container mx-auto px-4">
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-14">
             <h2 className="font-display text-3xl sm:text-4xl font-bold text-foreground mb-4">Why Choose ToLetHub?</h2>
@@ -64,8 +67,8 @@ const Landing = () => {
           </motion.div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {features.map((f, i) => (
-              <motion.div key={f.title} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }} className="bg-card rounded-xl p-6 card-shadow hover:card-shadow-hover transition-all duration-300">
-                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4"><f.icon className="w-6 h-6 text-primary" /></div>
+              <motion.div key={f.title} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }} whileHover={{ y: -4 }} className="glass rounded-2xl p-6 card-shadow hover:card-shadow-hover transition-all duration-300">
+                <div className="w-12 h-12 rounded-xl gradient-primary flex items-center justify-center mb-4 glow-primary"><f.icon className="w-6 h-6 text-primary-foreground" /></div>
                 <h3 className="font-display font-semibold text-lg text-card-foreground mb-2">{f.title}</h3>
                 <p className="text-muted-foreground text-sm leading-relaxed">{f.desc}</p>
               </motion.div>
@@ -95,18 +98,20 @@ const Landing = () => {
       )}
 
       {/* CTA */}
-      <section className="py-20 hero-gradient">
+      <section className="py-20 relative overflow-hidden">
+        <div className="absolute inset-0 hero-gradient" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] rounded-full bg-primary/30 blur-3xl" />
         <div className="container mx-auto px-4 text-center">
-          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
-            <h2 className="font-display text-3xl sm:text-4xl font-bold mb-4" style={{ color: "hsl(0 0% 100%)" }}>Ready to Find Your Home?</h2>
-            <p className="text-lg mb-8 max-w-xl mx-auto" style={{ color: "hsl(220 10% 75%)" }}>Join thousands of tenants who found their perfect rental through ToLetHub.</p>
+          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="relative z-10">
+            <h2 className="font-display text-3xl sm:text-4xl font-bold mb-4 text-foreground">Ready to Find Your <span className="text-gradient">Home?</span></h2>
+            <p className="text-lg mb-8 max-w-xl mx-auto text-foreground/75">Join thousands of tenants who found their perfect rental through ToLetHub.</p>
             <div className="flex justify-center gap-3">
               {user ? (
-                <Link to="/listings"><Button size="lg" className="text-base px-8">Browse Houses</Button></Link>
+                <Link to="/listings"><Button size="lg" className="text-base px-8 glow-primary">Browse Houses</Button></Link>
               ) : (
-                <Link to="/auth?mode=signup"><Button size="lg" className="text-base px-8">Create Free Account</Button></Link>
+                <Link to="/auth?mode=signup"><Button size="lg" className="text-base px-8 glow-primary">Create Free Account</Button></Link>
               )}
-              <Link to="/listings"><Button size="lg" variant="outline" className="text-base px-8 border-white/30 bg-white/10 text-white hover:bg-white/20 hover:text-white">Browse Listings</Button></Link>
+              <Link to="/listings"><Button size="lg" variant="outline" className="text-base px-8 glass border-primary/30 hover:bg-primary/10">Browse Listings</Button></Link>
             </div>
           </motion.div>
         </div>
