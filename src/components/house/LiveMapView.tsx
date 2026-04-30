@@ -82,6 +82,7 @@ const LiveMapView = ({
 }: LiveMapViewProps) => {
   const [followUser, setFollowUser] = useState(true);
   const [satellite, setSatellite] = useState(false);
+  const mapRef = useRef<L.Map | null>(null);
   const center: [number, number] = userPosition
     ? [userPosition.lat, userPosition.lng]
     : [12.9716, 77.5946];
@@ -104,6 +105,7 @@ const LiveMapView = ({
         zoomDelta={0.5}
         wheelPxPerZoomLevel={80}
         worldCopyJump
+        ref={(m) => { if (m) mapRef.current = m; }}
       >
         {satellite ? (
           <TileLayer
@@ -207,9 +209,21 @@ const LiveMapView = ({
       {/* Google-Maps style control stack — top-right */}
       <div className="absolute top-3 right-3 z-[1000] flex flex-col gap-2">
         <div className="glass-strong rounded-xl overflow-hidden flex flex-col">
-          <ZoomBtn dir="in" />
+          <button
+            onClick={() => mapRef.current?.zoomIn(1, { animate: true })}
+            className="w-10 h-10 flex items-center justify-center hover:bg-primary/20 text-foreground transition-colors"
+            aria-label="Zoom in"
+          >
+            <Plus className="w-4 h-4" />
+          </button>
           <div className="h-px bg-border/50" />
-          <ZoomBtn dir="out" />
+          <button
+            onClick={() => mapRef.current?.zoomOut(1, { animate: true })}
+            className="w-10 h-10 flex items-center justify-center hover:bg-primary/20 text-foreground transition-colors"
+            aria-label="Zoom out"
+          >
+            <Minus className="w-4 h-4" />
+          </button>
         </div>
         <button
           onClick={() => setSatellite((s) => !s)}
@@ -231,33 +245,6 @@ const LiveMapView = ({
         </button>
       )}
     </div>
-  );
-};
-
-/** Inline zoom button — uses useMap so MapContainer parent is required */
-const ZoomBtn = ({ dir }: { dir: "in" | "out" }) => {
-  return (
-    <ZoomBtnInner dir={dir} />
-  );
-};
-
-const ZoomBtnInner = ({ dir }: { dir: "in" | "out" }) => {
-  // Render via portal-less child of MapContainer is not available here,
-  // so we use a plain button + custom event dispatched from the map.
-  // Simpler: we render react-leaflet's ZoomControl invisibly and trigger via DOM.
-  return (
-    <button
-      onClick={() => {
-        const map = (window as any).__leafletMap as L.Map | undefined;
-        if (!map) return;
-        if (dir === "in") map.zoomIn(1, { animate: true });
-        else map.zoomOut(1, { animate: true });
-      }}
-      className="w-10 h-10 flex items-center justify-center hover:bg-primary/20 text-foreground transition-colors"
-      aria-label={dir === "in" ? "Zoom in" : "Zoom out"}
-    >
-      {dir === "in" ? <Plus className="w-4 h-4" /> : <Minus className="w-4 h-4" />}
-    </button>
   );
 };
 
