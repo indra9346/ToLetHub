@@ -3,7 +3,8 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Search, MapPin, Shield, Sparkles, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import heroImage from "@/assets/hero-building.jpg";
+import heroImage from "@/assets/tolethub-luxury-rentals.jpg";
+import heroVideo from "@/assets/tolethub-hero-loop.mp4";
 import HouseCard from "@/components/house/HouseCard";
 import { useHouses } from "@/hooks/useHouses";
 import { useAuth } from "@/hooks/useAuth";
@@ -21,15 +22,24 @@ const Landing = () => {
   const featured = (houses ?? []).slice(0, 3);
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen page-backdrop">
       {/* Hero */}
       <section className="relative min-h-[90vh] flex items-center overflow-hidden">
         <div className="absolute inset-0">
-          <img src={heroImage} alt="Modern apartment building" className="w-full h-full object-cover opacity-30" />
-          <div className="absolute inset-0 hero-gradient" />
-          {/* Floating mint orbs */}
-          <div className="absolute top-1/4 -left-32 w-96 h-96 rounded-full bg-primary/30 blur-3xl animate-pulse" />
-          <div className="absolute bottom-1/4 -right-32 w-96 h-96 rounded-full bg-accent/20 blur-3xl" />
+          <video
+            className="w-full h-full object-cover opacity-70"
+            autoPlay
+            muted
+            loop
+            playsInline
+            poster={heroImage}
+            aria-hidden="true"
+          >
+            <source src={heroVideo} type="video/mp4" />
+          </video>
+          <div className="absolute inset-0 bg-gradient-to-r from-background via-background/70 to-background/15" />
+          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/25 to-transparent" />
+          <div className="absolute inset-0 hero-scanlines opacity-35" />
         </div>
         <div className="container mx-auto px-4 relative z-10 pt-16">
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }} className="max-w-2xl">

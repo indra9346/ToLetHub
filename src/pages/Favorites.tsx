@@ -12,7 +12,7 @@ const Favorites = () => {
 
   if (!user) {
     return (
-      <div className="min-h-screen pt-20 pb-24 md:pb-8 flex items-center justify-center">
+      <div className="min-h-screen pt-20 pb-24 md:pb-8 flex items-center justify-center page-backdrop page-backdrop-listings">
         <div className="text-center">
           <Heart className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
           <h3 className="font-display text-xl font-semibold text-foreground mb-2">Sign in to see favorites</h3>
@@ -26,8 +26,8 @@ const Favorites = () => {
   const favHouses = favorites?.map((f: any) => f.houses).filter(Boolean) ?? [];
 
   return (
-    <div className="min-h-screen pt-20 pb-24 md:pb-8">
-      <div className="container mx-auto px-4">
+    <div className="min-h-screen pt-20 pb-24 md:pb-8 page-backdrop page-backdrop-listings">
+      <div className="container mx-auto px-4 relative z-10">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
           <h1 className="font-display text-3xl font-bold text-foreground mb-2">Saved Properties</h1>
           <p className="text-muted-foreground">{favHouses.length} saved {favHouses.length === 1 ? "property" : "properties"}</p>

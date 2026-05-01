@@ -5,17 +5,17 @@ import { Home, Search, Heart, User, Menu, X, MapPin, LogIn, LayoutDashboard, Log
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 
-const navItems = [
+const baseNavItems = [
   { path: "/", label: "Home", icon: Home },
   { path: "/listings", label: "Browse", icon: Search },
   { path: "/map", label: "Map View", icon: MapPin },
-  { path: "/favorites", label: "Favorites", icon: Heart },
 ];
 
 const Navbar = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
   const { user, isAdmin, signOut } = useAuth();
+  const navItems = isAdmin ? baseNavItems : [...baseNavItems, { path: "/favorites", label: "Favorites", icon: Heart }];
 
   return (
     <>

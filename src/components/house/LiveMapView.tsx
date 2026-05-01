@@ -1,10 +1,9 @@
-import { useEffect, useRef, useState, useMemo } from "react";
+import { useEffect, useRef, useState, type MutableRefObject, type RefObject } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMap, Circle, Polyline } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { Link } from "react-router-dom";
-import { IndianRupee, Navigation, X, Clock, MapPin as MapPinIcon, Plus, Minus, Layers } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Navigation, Plus, Minus, Layers } from "lucide-react";
 import { getDistanceKm } from "@/hooks/useGeolocation";
 
 // Fix leaflet default icons
@@ -17,14 +16,14 @@ L.Icon.Default.mergeOptions({
 
 const userIcon = L.divIcon({
   className: "user-location-marker",
-  html: `<div style="position:relative;width:20px;height:20px;"><div style="position:absolute;inset:-8px;border-radius:50%;background:rgba(45,212,168,0.25);animation:pulse 2s ease-out infinite;"></div><div style="position:relative;width:20px;height:20px;border-radius:50%;background:#2dd4a8;border:3px solid white;box-shadow:0 0 12px rgba(45,212,168,0.7);"></div></div>`,
+  html: `<div style="position:relative;width:20px;height:20px;"><div style="position:absolute;inset:-8px;border-radius:50%;background:hsl(var(--primary) / 0.25);animation:pulse 2s ease-out infinite;"></div><div style="position:relative;width:20px;height:20px;border-radius:50%;background:hsl(var(--primary));border:3px solid hsl(var(--foreground));box-shadow:0 0 12px hsl(var(--primary) / 0.7);"></div></div>`,
   iconSize: [20, 20],
   iconAnchor: [10, 10],
 });
 
 const houseIcon = L.divIcon({
   className: "house-marker",
-  html: `<div style="width:32px;height:32px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:linear-gradient(135deg,#2dd4a8,#73ffb8);border:2px solid white;box-shadow:0 4px 12px rgba(45,212,168,0.5);display:flex;align-items:center;justify-content:center;"><div style="transform:rotate(45deg);font-size:14px;">🏠</div></div>`,
+  html: `<div style="width:32px;height:32px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:var(--gradient-primary);border:2px solid hsl(var(--foreground));box-shadow:0 4px 12px hsl(var(--primary) / 0.5);display:flex;align-items:center;justify-content:center;"><div style="transform:rotate(45deg);font-size:14px;">🏠</div></div>`,
   iconSize: [28, 28],
   iconAnchor: [14, 14],
 });
@@ -72,6 +71,45 @@ const FitRoute = ({ route }: { route: [number, number][] }) => {
   return null;
 };
 
+const MapViewportFix = ({ hostRef }: { hostRef: RefObject<HTMLDivElement> }) => {
+  const map = useMap();
+
+  useEffect(() => {
+    const refresh = () => map.invalidateSize({ animate: false, pan: false });
+    const host = hostRef.current;
+    const observer = host ? new ResizeObserver(refresh) : null;
+    if (host && observer) observer.observe(host);
+
+    const timer = window.setTimeout(refresh, 150);
+    map.on("zoomend moveend layeradd", refresh);
+    window.addEventListener("orientationchange", refresh);
+    window.addEventListener("resize", refresh);
+
+    return () => {
+      window.clearTimeout(timer);
+      observer?.disconnect();
+      map.off("zoomend moveend layeradd", refresh);
+      window.removeEventListener("orientationchange", refresh);
+      window.removeEventListener("resize", refresh);
+    };
+  }, [hostRef, map]);
+
+  return null;
+};
+
+const MapRefBinder = ({ mapRef }: { mapRef: MutableRefObject<L.Map | null> }) => {
+  const map = useMap();
+
+  useEffect(() => {
+    mapRef.current = map;
+    return () => {
+      if (mapRef.current === map) mapRef.current = null;
+    };
+  }, [map, mapRef]);
+
+  return null;
+};
+
 const LiveMapView = ({
   houses,
   userPosition,
@@ -83,14 +121,16 @@ const LiveMapView = ({
   const [followUser, setFollowUser] = useState(true);
   const [satellite, setSatellite] = useState(false);
   const mapRef = useRef<L.Map | null>(null);
+  const hostRef = useRef<HTMLDivElement | null>(null);
   const center: [number, number] = userPosition
     ? [userPosition.lat, userPosition.lng]
     : [12.9716, 77.5946];
 
   return (
     <div
-      className={`rounded-2xl overflow-hidden relative isolate ${className}`}
-      style={{ contain: "layout paint", boxShadow: "var(--card-shadow)" }}
+      ref={hostRef}
+      className={`tolethub-map-shell rounded-2xl overflow-hidden relative isolate bg-secondary ${className}`}
+      style={{ boxShadow: "var(--card-shadow)" }}
     >
       <MapContainer
         center={center}
@@ -105,13 +145,14 @@ const LiveMapView = ({
         zoomDelta={0.5}
         wheelPxPerZoomLevel={80}
         worldCopyJump
-        ref={(m) => { if (m) mapRef.current = m; }}
       >
+        <MapViewportFix hostRef={hostRef} />
+        <MapRefBinder mapRef={mapRef} />
         {satellite ? (
           <TileLayer
             attribution='&copy; Esri'
             url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
-            keepBuffer={4}
+            keepBuffer={6}
             updateWhenIdle={false}
             updateWhenZooming={true}
             crossOrigin
@@ -120,7 +161,7 @@ const LiveMapView = ({
           <TileLayer
             attribution='&copy; OpenStreetMap'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            keepBuffer={4}
+            keepBuffer={6}
             updateWhenIdle={false}
             updateWhenZooming={true}
             crossOrigin
@@ -133,7 +174,7 @@ const LiveMapView = ({
             <Circle
               center={[userPosition.lat, userPosition.lng]}
               radius={30}
-              pathOptions={{ fillColor: "#3b82f6", fillOpacity: 0.08, color: "#3b82f6", weight: 1.5, dashArray: "4" }}
+              pathOptions={{ fillColor: "hsl(var(--primary))", fillOpacity: 0.08, color: "hsl(var(--primary))", weight: 1.5, dashArray: "4" }}
             />
             <Marker position={[userPosition.lat, userPosition.lng]} icon={userIcon}>
               <Popup>
@@ -151,7 +192,7 @@ const LiveMapView = ({
           <>
             <Polyline
               positions={routePoints}
-              pathOptions={{ color: "#3b82f6", weight: 5, opacity: 0.8, dashArray: "10, 6" }}
+              pathOptions={{ color: "hsl(var(--primary))", weight: 5, opacity: 0.8, dashArray: "10, 6" }}
             />
             <FitRoute route={routePoints} />
           </>
@@ -170,31 +211,29 @@ const LiveMapView = ({
                     className="w-full h-24 object-cover rounded mb-2"
                   />
                   <h3 className="font-semibold text-sm mb-1">{house.title}</h3>
-                  <p className="text-xs mb-1" style={{ color: "#666" }}>{house.address}</p>
+                  <p className="text-xs mb-1 text-muted-foreground">{house.address}</p>
                   <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center text-sm font-bold" style={{ color: "#e8572a" }}>
+                    <div className="flex items-center text-sm font-bold text-primary">
                       <span style={{ fontSize: "11px", marginRight: "2px" }}>₹</span>
                       {Number(house.rent).toLocaleString("en-IN")}/mo
                     </div>
-                    <span className="text-xs" style={{ color: "#666" }}>{house.rooms} Room{house.rooms > 1 ? "s" : ""}</span>
+                    <span className="text-xs text-muted-foreground">{house.rooms} Room{house.rooms > 1 ? "s" : ""}</span>
                   </div>
                   {userPosition && (
-                    <p className="text-xs mb-2" style={{ color: "#3b82f6" }}>
+                    <p className="text-xs mb-2 text-primary">
                       📍 {getDistanceKm(userPosition.lat, userPosition.lng, house.lat, house.lng).toFixed(1)} km away
                     </p>
                   )}
                   <div className="flex gap-1">
                     <button
                       onClick={() => onSelectHouse(house.id)}
-                      className="flex-1 px-2 py-1.5 rounded text-xs font-medium text-white"
-                      style={{ background: "#3b82f6" }}
+                      className="flex-1 px-2 py-1.5 rounded text-xs font-medium bg-primary text-primary-foreground"
                     >
                       🧭 Navigate Here
                     </button>
                     <Link
                       to={`/house/${house.id}`}
-                      className="px-2 py-1.5 rounded text-xs font-medium border"
-                      style={{ borderColor: "#ddd", color: "#333" }}
+                      className="px-2 py-1.5 rounded text-xs font-medium border border-border text-foreground"
                     >
                       Details
                     </Link>

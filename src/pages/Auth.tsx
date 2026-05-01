@@ -104,10 +104,7 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 pt-16 pb-24 md:pb-8 relative overflow-hidden">
-      {/* Ambient gradient orbs */}
-      <div className="pointer-events-none absolute -top-40 -left-40 w-[500px] h-[500px] rounded-full bg-primary/20 blur-3xl" />
-      <div className="pointer-events-none absolute -bottom-40 -right-40 w-[500px] h-[500px] rounded-full bg-accent/20 blur-3xl" />
+    <div className="min-h-screen flex items-center justify-center px-4 pt-16 pb-24 md:pb-8 relative overflow-hidden page-backdrop page-backdrop-auth">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}

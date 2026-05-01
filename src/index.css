@@ -61,6 +61,7 @@
     --gradient-mesh: radial-gradient(at 0% 0%, hsl(165 75% 50% / 0.18) 0%, transparent 50%),
                      radial-gradient(at 100% 0%, hsl(150 80% 70% / 0.12) 0%, transparent 50%),
                      radial-gradient(at 50% 100%, hsl(165 60% 40% / 0.15) 0%, transparent 50%);
+    --page-image-overlay: linear-gradient(180deg, hsl(var(--background) / 0.82), hsl(var(--background) / 0.96));
 
     /* Shadows + glass */
     --card-shadow: 0 4px 24px -4px hsl(165 75% 30% / 0.15), 0 0 0 1px hsl(165 25% 18% / 0.5);
@@ -92,7 +93,7 @@
 
   h1, h2, h3, h4, h5, h6 {
     font-family: 'Outfit', system-ui, sans-serif;
-    letter-spacing: -0.02em;
+    letter-spacing: 0;
   }
 }
 
@@ -142,11 +143,69 @@
     background-clip: text;
   }
 
+  .hero-scanlines {
+    background-image: linear-gradient(hsl(var(--foreground) / 0.08) 1px, transparent 1px);
+    background-size: 100% 6px;
+  }
+
+  .page-backdrop {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+  }
+
+  .page-backdrop::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background: var(--page-image-overlay), url('./assets/tolethub-luxury-rentals.jpg') center / cover no-repeat;
+    opacity: 0.42;
+    transform: scale(1.02);
+  }
+
+  .page-backdrop > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  .page-backdrop-listings::before {
+    background-position: center top;
+  }
+
+  .page-backdrop-map::before {
+    opacity: 0.24;
+    filter: saturate(1.1);
+  }
+
+  .page-backdrop-auth::before {
+    opacity: 0.5;
+    filter: saturate(1.15);
+  }
+
   /* Leaflet override — keep map inside its container, never overflow */
+  .tolethub-map-shell {
+    contain: layout paint size;
+    touch-action: pan-x pan-y pinch-zoom;
+  }
+
+  .tolethub-map-shell .leaflet-pane,
+  .tolethub-map-shell .leaflet-control-container,
+  .tolethub-map-shell .leaflet-top,
+  .tolethub-map-shell .leaflet-bottom {
+    z-index: auto !important;
+  }
+
   .leaflet-container {
     background: hsl(210 45% 8%) !important;
     font-family: 'Figtree', sans-serif !important;
+    width: 100% !important;
+    height: 100% !important;
     z-index: 0;
+  }
+  .leaflet-tile-container img {
+    max-width: none !important;
   }
   @keyframes pulse {
     0% { transform: scale(1); opacity: 0.6; }

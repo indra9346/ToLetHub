@@ -19,7 +19,7 @@ const HouseDetail = () => {
   const navigate = useNavigate();
   const { data: house, isLoading } = useHouse(id!);
   const [activeImg, setActiveImg] = useState(0);
-  const { user } = useAuth();
+  const { user, isAdmin } = useAuth();
   const { data: favIds } = useFavoriteIds();
   const toggleFavMutation = useToggleFavorite();
   const isFav = favIds?.includes(id!) ?? false;
@@ -59,10 +59,12 @@ const HouseDetail = () => {
 
   const images = house.images?.length ? house.images : ["https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800"];
   const videos = (house as any).videos ?? [];
+  const isOwnListing = !!user && user.id === (house as any).owner_id;
+  const canFavorite = !isAdmin && !isOwnListing;
 
   return (
-    <div className="min-h-screen pt-20 pb-24 md:pb-8">
-      <div className="container mx-auto px-4">
+    <div className="min-h-screen pt-20 pb-24 md:pb-8 page-backdrop page-backdrop-listings">
+      <div className="container mx-auto px-4 relative z-10">
         <Link to="/listings" className="inline-flex items-center gap-1.5 text-muted-foreground hover:text-foreground mb-6 text-sm transition-colors">
           <ArrowLeft className="w-4 h-4" /> Back to listings
         </Link>
@@ -119,9 +121,11 @@ const HouseDetail = () => {
                   </div>
                 </div>
                 <div className="flex gap-2">
-                  <Button variant="outline" size="icon" onClick={toggleFav}>
-                    <Heart className={`w-4 h-4 ${isFav ? "fill-primary text-primary" : ""}`} />
-                  </Button>
+                  {canFavorite && (
+                    <Button variant="outline" size="icon" onClick={toggleFav}>
+                      <Heart className={`w-4 h-4 ${isFav ? "fill-primary text-primary" : ""}`} />
+                    </Button>
+                  )}
                   <Button variant="outline" size="icon"><Share2 className="w-4 h-4" /></Button>
                 </div>
               </div>
@@ -139,7 +143,7 @@ const HouseDetail = () => {
                   { icon: Maximize, label: "Area", value: house.area ? `${house.area} sq.ft` : "N/A" },
                   { icon: Calendar, label: "Listed", value: new Date(house.created_at).toLocaleDateString() },
                 ].map((spec) => (
-                  <div key={spec.label} className="bg-secondary rounded-xl p-4 text-center">
+                  <div key={spec.label} className="glass rounded-xl p-4 text-center">
                     <spec.icon className="w-5 h-5 mx-auto mb-2 text-primary" />
                     <div className="font-display font-semibold text-foreground">{spec.value}</div>
                     <div className="text-xs text-muted-foreground">{spec.label}</div>
@@ -185,7 +189,7 @@ const HouseDetail = () => {
               </motion.div>
             )}
 
-            <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }} className="bg-card rounded-xl p-6 card-shadow sticky top-24">
+            <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }} className="glass-strong rounded-xl p-6 card-shadow sticky top-24">
               <h3 className="font-display text-lg font-semibold text-card-foreground mb-4">Contact Owner</h3>
               <div className="space-y-3 mb-6">
                 <div className="flex items-center gap-3">
