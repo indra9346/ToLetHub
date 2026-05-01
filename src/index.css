@@ -61,6 +61,7 @@
     --gradient-mesh: radial-gradient(at 0% 0%, hsl(165 75% 50% / 0.18) 0%, transparent 50%),
                      radial-gradient(at 100% 0%, hsl(150 80% 70% / 0.12) 0%, transparent 50%),
                      radial-gradient(at 50% 100%, hsl(165 60% 40% / 0.15) 0%, transparent 50%);
+    --page-image-overlay: linear-gradient(180deg, hsl(var(--background) / 0.82), hsl(var(--background) / 0.96));
 
     /* Shadows + glass */
     --card-shadow: 0 4px 24px -4px hsl(165 75% 30% / 0.15), 0 0 0 1px hsl(165 25% 18% / 0.5);
@@ -92,7 +93,7 @@
 
   h1, h2, h3, h4, h5, h6 {
     font-family: 'Outfit', system-ui, sans-serif;
-    letter-spacing: -0.02em;
+    letter-spacing: 0;
   }
 }
 
