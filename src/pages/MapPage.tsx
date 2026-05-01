@@ -151,8 +151,8 @@ const MapPage = () => {
   // Don't block rendering on loading - show map with available data
 
   return (
-    <div className="min-h-screen pt-20 pb-24 md:pb-8">
-      <div className="container mx-auto px-4">
+    <div className="min-h-screen pt-20 pb-24 md:pb-8 page-backdrop page-backdrop-map">
+      <div className="container mx-auto px-4 relative z-10">
         {/* Header */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-4">
           <div className="flex items-center justify-between">
@@ -192,7 +192,7 @@ const MapPage = () => {
           )}
         </motion.div>
 
-        <div className="grid lg:grid-cols-3 gap-4">
+        <div className="grid lg:grid-cols-3 gap-4 items-start">
           {/* Map */}
           <div className="lg:col-span-2">
             <Suspense
@@ -208,7 +208,7 @@ const MapPage = () => {
               <LiveMapView
                 houses={(houses ?? []) as any}
                 userPosition={geo.position}
-                className="h-[calc(100vh-200px)]"
+                className="h-[58vh] min-h-[360px] max-h-[640px] md:h-[calc(100vh-220px)]"
                 selectedHouseId={selectedHouseId}
                 onSelectHouse={(id) => {
                   if (id && geo.position) {
