@@ -249,15 +249,15 @@ const AdminDashboard = () => {
   return (
     <div className="min-h-screen pt-20 pb-24 md:pb-8">
       <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex flex-wrap items-center justify-between gap-3 mb-8">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
             <h1 className="font-display text-3xl font-bold text-foreground mb-1">Admin Dashboard</h1>
             <p className="text-muted-foreground">{myHouses?.length ?? 0} properties listed</p>
           </motion.div>
-          <div className="flex gap-2">
+          <div className="flex gap-2 w-full sm:w-auto">
             <Dialog open={dialogOpen} onOpenChange={(o) => { setDialogOpen(o); if (!o) { setEditingId(null); setForm(emptyForm); setImageFiles([]); } }}>
               <DialogTrigger asChild>
-                <Button className="gap-2"><Plus className="w-4 h-4" /> Add House</Button>
+                <Button className="gap-2 w-full sm:w-auto glow-primary"><Plus className="w-4 h-4" /> Add House</Button>
               </DialogTrigger>
               <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
@@ -444,9 +444,21 @@ const AdminDashboard = () => {
             <Home className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
             <h3 className="font-display text-xl font-semibold text-foreground mb-2">No listings yet</h3>
             <p className="text-muted-foreground mb-6">Click "Add House" to create your first listing.</p>
+            <Button onClick={() => setDialogOpen(true)} className="gap-2 glow-primary">
+              <Plus className="w-4 h-4" /> Add Your First House
+            </Button>
           </div>
         )}
       </div>
+
+      {/* Mobile Floating Action Button — always reachable above bottom nav */}
+      <Button
+        onClick={() => setDialogOpen(true)}
+        aria-label="Add House"
+        className="md:hidden fixed bottom-20 right-4 z-40 w-14 h-14 rounded-full glow-primary shadow-lg p-0 flex items-center justify-center"
+      >
+        <Plus className="w-6 h-6" />
+      </Button>
     </div>
   );
 };

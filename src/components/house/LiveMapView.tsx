@@ -111,18 +111,18 @@ const LiveMapView = ({
           <TileLayer
             attribution='&copy; Esri'
             url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
-            keepBuffer={2}
-            updateWhenIdle
-            updateWhenZooming={false}
+            keepBuffer={4}
+            updateWhenIdle={false}
+            updateWhenZooming={true}
             crossOrigin
           />
         ) : (
           <TileLayer
             attribution='&copy; OpenStreetMap'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            keepBuffer={2}
-            updateWhenIdle
-            updateWhenZooming={false}
+            keepBuffer={4}
+            updateWhenIdle={false}
+            updateWhenZooming={true}
             crossOrigin
           />
         )}
