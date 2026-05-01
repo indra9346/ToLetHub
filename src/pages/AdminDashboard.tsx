@@ -247,8 +247,8 @@ const AdminDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen pt-20 pb-24 md:pb-8">
-      <div className="container mx-auto px-4">
+    <div className="min-h-screen pt-20 pb-24 md:pb-8 page-backdrop page-backdrop-listings">
+      <div className="container mx-auto px-4 relative z-10">
         <div className="flex flex-wrap items-center justify-between gap-3 mb-8">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
             <h1 className="font-display text-3xl font-bold text-foreground mb-1">Admin Dashboard</h1>
@@ -398,7 +398,7 @@ const AdminDashboard = () => {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.05 }}
-                className="bg-card rounded-xl p-4 card-shadow flex flex-col sm:flex-row gap-4"
+                className="glass-strong rounded-xl p-4 card-shadow flex flex-col sm:flex-row gap-4"
               >
                 <img
                   src={house.images?.[0] || "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=400"}
@@ -440,7 +440,7 @@ const AdminDashboard = () => {
             ))}
           </div>
         ) : (
-          <div className="text-center py-20">
+          <div className="text-center py-20 glass-strong rounded-2xl card-shadow">
             <Home className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
             <h3 className="font-display text-xl font-semibold text-foreground mb-2">No listings yet</h3>
             <p className="text-muted-foreground mb-6">Click "Add House" to create your first listing.</p>
