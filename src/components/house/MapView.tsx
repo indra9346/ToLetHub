@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef, type RefObject } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
@@ -42,13 +42,41 @@ const FitBounds = ({ houses }: { houses: MapHouse[] }) => {
   return null;
 };
 
+const MapViewportFix = ({ hostRef }: { hostRef: RefObject<HTMLDivElement> }) => {
+  const map = useMap();
+  useEffect(() => {
+    const refresh = () => map.invalidateSize({ animate: false, pan: false });
+    const host = hostRef.current;
+    const observer = host ? new ResizeObserver(refresh) : null;
+    if (host && observer) observer.observe(host);
+    const timer = window.setTimeout(refresh, 150);
+    map.on("zoomend moveend layeradd", refresh);
+    window.addEventListener("resize", refresh);
+    window.addEventListener("orientationchange", refresh);
+    return () => {
+      window.clearTimeout(timer);
+      observer?.disconnect();
+      map.off("zoomend moveend layeradd", refresh);
+      window.removeEventListener("resize", refresh);
+      window.removeEventListener("orientationchange", refresh);
+    };
+  }, [hostRef, map]);
+  return null;
+};
+
 const MapView = ({ houses, center = [12.9716, 77.5946], zoom = 12, className = "h-[400px]", singleMarker = false }: MapViewProps) => {
+  const hostRef = useRef<HTMLDivElement | null>(null);
+
   return (
-    <div className={`rounded-xl overflow-hidden border border-border ${className}`}>
-      <MapContainer center={center} zoom={zoom} className="w-full h-full" scrollWheelZoom attributionControl={false}>
+    <div ref={hostRef} className={`tolethub-map-shell rounded-xl overflow-hidden border border-border bg-secondary ${className}`}>
+      <MapContainer center={center} zoom={zoom} className="w-full h-full" scrollWheelZoom zoomControl={false} attributionControl={false}>
+        <MapViewportFix hostRef={hostRef} />
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          keepBuffer={6}
+          updateWhenIdle={false}
+          updateWhenZooming={true}
         />
         {!singleMarker && houses.length > 1 && <FitBounds houses={houses} />}
         {houses.map((house) => (
