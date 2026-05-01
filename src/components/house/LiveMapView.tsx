@@ -71,6 +71,32 @@ const FitRoute = ({ route }: { route: [number, number][] }) => {
   return null;
 };
 
+const MapViewportFix = ({ hostRef }: { hostRef: RefObject<HTMLDivElement> }) => {
+  const map = useMap();
+
+  useEffect(() => {
+    const refresh = () => map.invalidateSize({ animate: false, pan: false });
+    const host = hostRef.current;
+    const observer = host ? new ResizeObserver(refresh) : null;
+    if (host && observer) observer.observe(host);
+
+    const timer = window.setTimeout(refresh, 150);
+    map.on("zoomend moveend layeradd", refresh);
+    window.addEventListener("orientationchange", refresh);
+    window.addEventListener("resize", refresh);
+
+    return () => {
+      window.clearTimeout(timer);
+      observer?.disconnect();
+      map.off("zoomend moveend layeradd", refresh);
+      window.removeEventListener("orientationchange", refresh);
+      window.removeEventListener("resize", refresh);
+    };
+  }, [hostRef, map]);
+
+  return null;
+};
+
 const LiveMapView = ({
   houses,
   userPosition,
@@ -82,14 +108,16 @@ const LiveMapView = ({
   const [followUser, setFollowUser] = useState(true);
   const [satellite, setSatellite] = useState(false);
   const mapRef = useRef<L.Map | null>(null);
+  const hostRef = useRef<HTMLDivElement | null>(null);
   const center: [number, number] = userPosition
     ? [userPosition.lat, userPosition.lng]
     : [12.9716, 77.5946];
 
   return (
     <div
-      className={`rounded-2xl overflow-hidden relative isolate ${className}`}
-      style={{ contain: "layout paint", boxShadow: "var(--card-shadow)" }}
+      ref={hostRef}
+      className={`tolethub-map-shell rounded-2xl overflow-hidden relative isolate bg-secondary ${className}`}
+      style={{ boxShadow: "var(--card-shadow)" }}
     >
       <MapContainer
         center={center}
@@ -106,11 +134,12 @@ const LiveMapView = ({
         worldCopyJump
         ref={(m) => { if (m) mapRef.current = m; }}
       >
+        <MapViewportFix hostRef={hostRef} />
         {satellite ? (
           <TileLayer
             attribution='&copy; Esri'
             url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
-            keepBuffer={4}
+            keepBuffer={6}
             updateWhenIdle={false}
             updateWhenZooming={true}
             crossOrigin
@@ -119,7 +148,7 @@ const LiveMapView = ({
           <TileLayer
             attribution='&copy; OpenStreetMap'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            keepBuffer={4}
+            keepBuffer={6}
             updateWhenIdle={false}
             updateWhenZooming={true}
             crossOrigin
