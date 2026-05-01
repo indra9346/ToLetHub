@@ -89,12 +89,12 @@ const MapView = ({ houses, center = [12.9716, 77.5946], zoom = 12, className = "
                   className="w-full h-24 object-cover rounded mb-2"
                 />
                 <h3 className="font-semibold text-sm mb-1">{house.title}</h3>
-                <p className="text-xs mb-1" style={{ color: "#666" }}>{house.address}</p>
-                <div className="flex items-center text-sm font-bold" style={{ color: "#e8572a" }}>
+                <p className="text-xs mb-1 text-muted-foreground">{house.address}</p>
+                <div className="flex items-center text-sm font-bold text-primary">
                   <IndianRupee className="w-3 h-3" />
                   {Number(house.rent).toLocaleString("en-IN")}/mo
                 </div>
-                <Link to={`/house/${house.id}`} className="text-xs underline mt-1 inline-block" style={{ color: "#3b82f6" }}>
+                <Link to={`/house/${house.id}`} className="text-xs underline mt-1 inline-block text-primary">
                   View Details →
                 </Link>
               </div>
