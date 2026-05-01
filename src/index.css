@@ -151,6 +151,7 @@
   .page-backdrop {
     position: relative;
     overflow: hidden;
+    isolation: isolate;
   }
 
   .page-backdrop::before {
@@ -159,9 +160,14 @@
     inset: 0;
     z-index: 0;
     pointer-events: none;
-    background: var(--page-image-overlay), url('/src/assets/tolethub-luxury-rentals.jpg') center / cover no-repeat;
+    background: var(--page-image-overlay), url('./assets/tolethub-luxury-rentals.jpg') center / cover no-repeat;
     opacity: 0.42;
     transform: scale(1.02);
+  }
+
+  .page-backdrop > * {
+    position: relative;
+    z-index: 1;
   }
 
   .page-backdrop-listings::before {
