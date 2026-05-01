@@ -249,15 +249,15 @@ const AdminDashboard = () => {
   return (
     <div className="min-h-screen pt-20 pb-24 md:pb-8">
       <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex flex-wrap items-center justify-between gap-3 mb-8">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
             <h1 className="font-display text-3xl font-bold text-foreground mb-1">Admin Dashboard</h1>
             <p className="text-muted-foreground">{myHouses?.length ?? 0} properties listed</p>
           </motion.div>
-          <div className="flex gap-2">
+          <div className="flex gap-2 w-full sm:w-auto">
             <Dialog open={dialogOpen} onOpenChange={(o) => { setDialogOpen(o); if (!o) { setEditingId(null); setForm(emptyForm); setImageFiles([]); } }}>
               <DialogTrigger asChild>
-                <Button className="gap-2"><Plus className="w-4 h-4" /> Add House</Button>
+                <Button className="gap-2 w-full sm:w-auto glow-primary"><Plus className="w-4 h-4" /> Add House</Button>
               </DialogTrigger>
               <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
