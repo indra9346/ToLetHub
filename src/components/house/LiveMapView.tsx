@@ -198,13 +198,13 @@ const LiveMapView = ({
                     className="w-full h-24 object-cover rounded mb-2"
                   />
                   <h3 className="font-semibold text-sm mb-1">{house.title}</h3>
-                  <p className="text-xs mb-1" style={{ color: "#666" }}>{house.address}</p>
+                  <p className="text-xs mb-1 text-muted-foreground">{house.address}</p>
                   <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center text-sm font-bold" style={{ color: "#e8572a" }}>
+                    <div className="flex items-center text-sm font-bold text-primary">
                       <span style={{ fontSize: "11px", marginRight: "2px" }}>₹</span>
                       {Number(house.rent).toLocaleString("en-IN")}/mo
                     </div>
-                    <span className="text-xs" style={{ color: "#666" }}>{house.rooms} Room{house.rooms > 1 ? "s" : ""}</span>
+                    <span className="text-xs text-muted-foreground">{house.rooms} Room{house.rooms > 1 ? "s" : ""}</span>
                   </div>
                   {userPosition && (
                     <p className="text-xs mb-2 text-primary">
@@ -220,8 +220,7 @@ const LiveMapView = ({
                     </button>
                     <Link
                       to={`/house/${house.id}`}
-                      className="px-2 py-1.5 rounded text-xs font-medium border"
-                      style={{ borderColor: "#ddd", color: "#333" }}
+                      className="px-2 py-1.5 rounded text-xs font-medium border border-border text-foreground"
                     >
                       Details
                     </Link>
