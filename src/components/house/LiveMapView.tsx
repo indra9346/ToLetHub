@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type RefObject } from "react";
+import { useEffect, useRef, useState, type MutableRefObject, type RefObject } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMap, Circle, Polyline } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
@@ -97,6 +97,19 @@ const MapViewportFix = ({ hostRef }: { hostRef: RefObject<HTMLDivElement> }) => 
   return null;
 };
 
+const MapRefBinder = ({ mapRef }: { mapRef: MutableRefObject<L.Map | null> }) => {
+  const map = useMap();
+
+  useEffect(() => {
+    mapRef.current = map;
+    return () => {
+      if (mapRef.current === map) mapRef.current = null;
+    };
+  }, [map, mapRef]);
+
+  return null;
+};
+
 const LiveMapView = ({
   houses,
   userPosition,
@@ -132,9 +145,9 @@ const LiveMapView = ({
         zoomDelta={0.5}
         wheelPxPerZoomLevel={80}
         worldCopyJump
-        ref={(m) => { if (m) mapRef.current = m; }}
       >
         <MapViewportFix hostRef={hostRef} />
+        <MapRefBinder mapRef={mapRef} />
         {satellite ? (
           <TileLayer
             attribution='&copy; Esri'
