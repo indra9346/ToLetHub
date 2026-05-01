@@ -444,9 +444,21 @@ const AdminDashboard = () => {
             <Home className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
             <h3 className="font-display text-xl font-semibold text-foreground mb-2">No listings yet</h3>
             <p className="text-muted-foreground mb-6">Click "Add House" to create your first listing.</p>
+            <Button onClick={() => setDialogOpen(true)} className="gap-2 glow-primary">
+              <Plus className="w-4 h-4" /> Add Your First House
+            </Button>
           </div>
         )}
       </div>
+
+      {/* Mobile Floating Action Button — always reachable above bottom nav */}
+      <Button
+        onClick={() => setDialogOpen(true)}
+        aria-label="Add House"
+        className="md:hidden fixed bottom-20 right-4 z-40 w-14 h-14 rounded-full glow-primary shadow-lg p-0 flex items-center justify-center"
+      >
+        <Plus className="w-6 h-6" />
+      </Button>
     </div>
   );
 };
