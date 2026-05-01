@@ -19,7 +19,7 @@ const HouseDetail = () => {
   const navigate = useNavigate();
   const { data: house, isLoading } = useHouse(id!);
   const [activeImg, setActiveImg] = useState(0);
-  const { user } = useAuth();
+  const { user, isAdmin } = useAuth();
   const { data: favIds } = useFavoriteIds();
   const toggleFavMutation = useToggleFavorite();
   const isFav = favIds?.includes(id!) ?? false;
@@ -59,6 +59,8 @@ const HouseDetail = () => {
 
   const images = house.images?.length ? house.images : ["https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800"];
   const videos = (house as any).videos ?? [];
+  const isOwnListing = !!user && user.id === (house as any).owner_id;
+  const canFavorite = !isAdmin && !isOwnListing;
 
   return (
     <div className="min-h-screen pt-20 pb-24 md:pb-8 page-backdrop page-backdrop-listings">
@@ -119,9 +121,11 @@ const HouseDetail = () => {
                   </div>
                 </div>
                 <div className="flex gap-2">
-                  <Button variant="outline" size="icon" onClick={toggleFav}>
-                    <Heart className={`w-4 h-4 ${isFav ? "fill-primary text-primary" : ""}`} />
-                  </Button>
+                  {canFavorite && (
+                    <Button variant="outline" size="icon" onClick={toggleFav}>
+                      <Heart className={`w-4 h-4 ${isFav ? "fill-primary text-primary" : ""}`} />
+                    </Button>
+                  )}
                   <Button variant="outline" size="icon"><Share2 className="w-4 h-4" /></Button>
                 </div>
               </div>
