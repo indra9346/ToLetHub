@@ -161,7 +161,7 @@ const LiveMapView = ({
             <Circle
               center={[userPosition.lat, userPosition.lng]}
               radius={30}
-              pathOptions={{ fillColor: "#3b82f6", fillOpacity: 0.08, color: "#3b82f6", weight: 1.5, dashArray: "4" }}
+              pathOptions={{ fillColor: "hsl(var(--primary))", fillOpacity: 0.08, color: "hsl(var(--primary))", weight: 1.5, dashArray: "4" }}
             />
             <Marker position={[userPosition.lat, userPosition.lng]} icon={userIcon}>
               <Popup>
@@ -179,7 +179,7 @@ const LiveMapView = ({
           <>
             <Polyline
               positions={routePoints}
-              pathOptions={{ color: "#3b82f6", weight: 5, opacity: 0.8, dashArray: "10, 6" }}
+              pathOptions={{ color: "hsl(var(--primary))", weight: 5, opacity: 0.8, dashArray: "10, 6" }}
             />
             <FitRoute route={routePoints} />
           </>
@@ -207,15 +207,14 @@ const LiveMapView = ({
                     <span className="text-xs" style={{ color: "#666" }}>{house.rooms} Room{house.rooms > 1 ? "s" : ""}</span>
                   </div>
                   {userPosition && (
-                    <p className="text-xs mb-2" style={{ color: "#3b82f6" }}>
+                    <p className="text-xs mb-2 text-primary">
                       📍 {getDistanceKm(userPosition.lat, userPosition.lng, house.lat, house.lng).toFixed(1)} km away
                     </p>
                   )}
                   <div className="flex gap-1">
                     <button
                       onClick={() => onSelectHouse(house.id)}
-                      className="flex-1 px-2 py-1.5 rounded text-xs font-medium text-white"
-                      style={{ background: "#3b82f6" }}
+                      className="flex-1 px-2 py-1.5 rounded text-xs font-medium bg-primary text-primary-foreground"
                     >
                       🧭 Navigate Here
                     </button>
