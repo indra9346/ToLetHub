@@ -102,8 +102,8 @@ const Listings = () => {
   };
 
   return (
-    <div className="min-h-screen pt-20 pb-24 md:pb-8">
-      <div className="container mx-auto px-4">
+    <div className="min-h-screen pt-20 pb-24 md:pb-8 page-backdrop page-backdrop-listings">
+      <div className="container mx-auto px-4 relative z-10">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
           <h1 className="font-display text-3xl font-bold text-foreground mb-2">Browse Rental Houses</h1>
           <p className="text-muted-foreground">
@@ -114,7 +114,7 @@ const Listings = () => {
         </motion.div>
 
         {/* City / country fallback search */}
-        <form onSubmit={handleCitySearch} className="bg-card rounded-xl p-4 mb-4 card-shadow flex flex-col sm:flex-row gap-3">
+        <form onSubmit={handleCitySearch} className="glass-strong rounded-xl p-4 mb-4 card-shadow flex flex-col sm:flex-row gap-3">
           <div className="flex-1 relative">
             <Globe2 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
@@ -165,7 +165,7 @@ const Listings = () => {
         </div>
 
         {showFilters && (
-          <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} className="bg-card rounded-xl p-6 mb-6 card-shadow">
+          <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} className="glass-strong rounded-xl p-6 mb-6 card-shadow">
             <div className="grid sm:grid-cols-3 gap-6">
               <div>
                 <label className="text-sm font-medium text-foreground mb-2 block">
