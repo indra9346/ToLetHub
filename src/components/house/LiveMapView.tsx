@@ -1,10 +1,9 @@
-import { useEffect, useRef, useState, useMemo } from "react";
+import { useEffect, useRef, useState, type RefObject } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMap, Circle, Polyline } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { Link } from "react-router-dom";
-import { IndianRupee, Navigation, X, Clock, MapPin as MapPinIcon, Plus, Minus, Layers } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Navigation, Plus, Minus, Layers } from "lucide-react";
 import { getDistanceKm } from "@/hooks/useGeolocation";
 
 // Fix leaflet default icons
@@ -17,14 +16,14 @@ L.Icon.Default.mergeOptions({
 
 const userIcon = L.divIcon({
   className: "user-location-marker",
-  html: `<div style="position:relative;width:20px;height:20px;"><div style="position:absolute;inset:-8px;border-radius:50%;background:rgba(45,212,168,0.25);animation:pulse 2s ease-out infinite;"></div><div style="position:relative;width:20px;height:20px;border-radius:50%;background:#2dd4a8;border:3px solid white;box-shadow:0 0 12px rgba(45,212,168,0.7);"></div></div>`,
+  html: `<div style="position:relative;width:20px;height:20px;"><div style="position:absolute;inset:-8px;border-radius:50%;background:hsl(var(--primary) / 0.25);animation:pulse 2s ease-out infinite;"></div><div style="position:relative;width:20px;height:20px;border-radius:50%;background:hsl(var(--primary));border:3px solid hsl(var(--foreground));box-shadow:0 0 12px hsl(var(--primary) / 0.7);"></div></div>`,
   iconSize: [20, 20],
   iconAnchor: [10, 10],
 });
 
 const houseIcon = L.divIcon({
   className: "house-marker",
-  html: `<div style="width:32px;height:32px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:linear-gradient(135deg,#2dd4a8,#73ffb8);border:2px solid white;box-shadow:0 4px 12px rgba(45,212,168,0.5);display:flex;align-items:center;justify-content:center;"><div style="transform:rotate(45deg);font-size:14px;">🏠</div></div>`,
+  html: `<div style="width:32px;height:32px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:var(--gradient-primary);border:2px solid hsl(var(--foreground));box-shadow:0 4px 12px hsl(var(--primary) / 0.5);display:flex;align-items:center;justify-content:center;"><div style="transform:rotate(45deg);font-size:14px;">🏠</div></div>`,
   iconSize: [28, 28],
   iconAnchor: [14, 14],
 });
