@@ -15,10 +15,14 @@ interface HouseCardProps {
 
 const HouseCard = ({ house, index = 0 }: HouseCardProps) => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, isAdmin, loading: authLoading } = useAuth();
   const { data: favIds } = useFavoriteIds();
   const toggleFav = useToggleFavorite();
   const isFav = favIds?.includes(house.id) ?? false;
+
+  // Owners (admins) and the listing's own owner shouldn't see "favorite"
+  const isOwnListing = !!user && user.id === (house as any).owner_id;
+  const canFavorite = !authLoading && !isAdmin && !isOwnListing;
 
   const handleToggleFav = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -48,16 +52,19 @@ const HouseCard = ({ house, index = 0 }: HouseCardProps) => {
               loading="lazy"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-transparent" />
-            <button
-              onClick={handleToggleFav}
-              className="absolute top-3 right-3 w-9 h-9 rounded-full glass flex items-center justify-center transition-transform hover:scale-110"
-            >
-              <Heart
-                className={`w-4 h-4 transition-colors ${
-                  isFav ? "fill-primary text-primary" : "text-foreground"
-                }`}
-              />
-            </button>
+            {canFavorite && (
+              <button
+                onClick={handleToggleFav}
+                aria-label={isFav ? "Remove from favorites" : "Add to favorites"}
+                className="absolute top-3 right-3 w-9 h-9 rounded-full glass flex items-center justify-center transition-transform hover:scale-110"
+              >
+                <Heart
+                  className={`w-4 h-4 transition-colors ${
+                    isFav ? "fill-primary text-primary" : "text-foreground"
+                  }`}
+                />
+              </button>
+            )}
             <Badge
               className={`absolute top-3 left-3 ${
                 house.status === "vacant"
