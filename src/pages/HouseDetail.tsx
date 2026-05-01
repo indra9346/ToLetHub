@@ -61,8 +61,8 @@ const HouseDetail = () => {
   const videos = (house as any).videos ?? [];
 
   return (
-    <div className="min-h-screen pt-20 pb-24 md:pb-8">
-      <div className="container mx-auto px-4">
+    <div className="min-h-screen pt-20 pb-24 md:pb-8 page-backdrop page-backdrop-listings">
+      <div className="container mx-auto px-4 relative z-10">
         <Link to="/listings" className="inline-flex items-center gap-1.5 text-muted-foreground hover:text-foreground mb-6 text-sm transition-colors">
           <ArrowLeft className="w-4 h-4" /> Back to listings
         </Link>
@@ -139,7 +139,7 @@ const HouseDetail = () => {
                   { icon: Maximize, label: "Area", value: house.area ? `${house.area} sq.ft` : "N/A" },
                   { icon: Calendar, label: "Listed", value: new Date(house.created_at).toLocaleDateString() },
                 ].map((spec) => (
-                  <div key={spec.label} className="bg-secondary rounded-xl p-4 text-center">
+                  <div key={spec.label} className="glass rounded-xl p-4 text-center">
                     <spec.icon className="w-5 h-5 mx-auto mb-2 text-primary" />
                     <div className="font-display font-semibold text-foreground">{spec.value}</div>
                     <div className="text-xs text-muted-foreground">{spec.label}</div>
@@ -185,7 +185,7 @@ const HouseDetail = () => {
               </motion.div>
             )}
 
-            <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }} className="bg-card rounded-xl p-6 card-shadow sticky top-24">
+            <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }} className="glass-strong rounded-xl p-6 card-shadow sticky top-24">
               <h3 className="font-display text-lg font-semibold text-card-foreground mb-4">Contact Owner</h3>
               <div className="space-y-3 mb-6">
                 <div className="flex items-center gap-3">
