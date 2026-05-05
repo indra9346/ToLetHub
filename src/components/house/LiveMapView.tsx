@@ -142,7 +142,13 @@ const LiveMapView = ({
 
   // Lock body scroll when fullscreen + ESC to exit
   useEffect(() => {
-    window.setTimeout(() => mapRef.current?.invalidateSize({ animate: false, pan: false }), 80);
+    const refreshMap = () => {
+      mapRef.current?.invalidateSize({ animate: false, pan: false });
+      mapRef.current?.eachLayer((layer) => {
+        if (layer instanceof L.TileLayer) layer.redraw();
+      });
+    };
+    const timers = [80, 280, 700].map((delay) => window.setTimeout(refreshMap, delay));
     if (!fullscreen) return;
     const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
@@ -151,10 +157,21 @@ const LiveMapView = ({
     };
     window.addEventListener("keydown", onKey);
     return () => {
+      timers.forEach(window.clearTimeout);
       document.body.style.overflow = prev;
       window.removeEventListener("keydown", onKey);
     };
   }, [fullscreen]);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      mapRef.current?.invalidateSize({ animate: false, pan: false });
+      mapRef.current?.eachLayer((layer) => {
+        if (layer instanceof L.TileLayer) layer.redraw();
+      });
+    }, 120);
+    return () => window.clearTimeout(timer);
+  }, [satellite]);
 
   const wrapperClass = fullscreen
     ? "fixed inset-0 z-[2000] rounded-none bg-background"
