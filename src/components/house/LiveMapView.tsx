@@ -3,7 +3,7 @@ import { MapContainer, TileLayer, Marker, Popup, useMap, Circle, Polyline } from
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { Link } from "react-router-dom";
-import { Navigation, Plus, Minus, Layers } from "lucide-react";
+import { Navigation, Plus, Minus, Layers, Maximize2, Minimize2 } from "lucide-react";
 import { getDistanceKm } from "@/hooks/useGeolocation";
 
 // Fix leaflet default icons
@@ -120,16 +120,36 @@ const LiveMapView = ({
 }: LiveMapViewProps) => {
   const [followUser, setFollowUser] = useState(true);
   const [satellite, setSatellite] = useState(false);
+  const [fullscreen, setFullscreen] = useState(false);
   const mapRef = useRef<L.Map | null>(null);
   const hostRef = useRef<HTMLDivElement | null>(null);
   const center: [number, number] = userPosition
     ? [userPosition.lat, userPosition.lng]
     : [12.9716, 77.5946];
 
+  // Lock body scroll when fullscreen + ESC to exit
+  useEffect(() => {
+    if (!fullscreen) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setFullscreen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = prev;
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [fullscreen]);
+
+  const wrapperClass = fullscreen
+    ? "fixed inset-0 z-[2000] rounded-none bg-background"
+    : `rounded-2xl ${className}`;
+
   return (
     <div
       ref={hostRef}
-      className={`tolethub-map-shell rounded-2xl overflow-hidden relative isolate bg-secondary ${className}`}
+      className={`tolethub-map-shell overflow-hidden relative isolate bg-secondary ${wrapperClass}`}
       style={{ boxShadow: "var(--card-shadow)" }}
     >
       <MapContainer
@@ -246,7 +266,7 @@ const LiveMapView = ({
       </MapContainer>
 
       {/* Google-Maps style control stack — top-right */}
-      <div className="absolute top-3 right-3 z-[1000] flex flex-col gap-2">
+      <div className={`absolute right-3 z-[1000] flex flex-col gap-2 ${fullscreen ? "top-6" : "top-3"}`}>
         <div className="glass-strong rounded-xl overflow-hidden flex flex-col">
           <button
             onClick={() => mapRef.current?.zoomIn(1, { animate: true })}
@@ -268,8 +288,17 @@ const LiveMapView = ({
           onClick={() => setSatellite((s) => !s)}
           className="glass-strong rounded-xl w-10 h-10 flex items-center justify-center hover:bg-primary/20 transition-colors"
           title={satellite ? "Switch to map" : "Switch to satellite"}
+          aria-label={satellite ? "Switch to map view" : "Switch to satellite view"}
         >
           <Layers className="w-4 h-4 text-foreground" />
+        </button>
+        <button
+          onClick={() => setFullscreen((f) => !f)}
+          className="glass-strong rounded-xl w-10 h-10 flex items-center justify-center hover:bg-primary/20 transition-colors"
+          title={fullscreen ? "Exit fullscreen" : "Open fullscreen"}
+          aria-label={fullscreen ? "Exit fullscreen map" : "Open fullscreen map"}
+        >
+          {fullscreen ? <Minimize2 className="w-4 h-4 text-foreground" /> : <Maximize2 className="w-4 h-4 text-foreground" />}
         </button>
       </div>
 
@@ -277,8 +306,11 @@ const LiveMapView = ({
       {userPosition && (
         <button
           onClick={() => setFollowUser(true)}
-          className="absolute bottom-4 right-4 z-[1000] w-11 h-11 rounded-full glass-strong flex items-center justify-center hover:glow-primary transition-all"
+          className={`absolute right-4 z-[1000] w-11 h-11 rounded-full glass-strong flex items-center justify-center hover:glow-primary transition-all ${
+            fullscreen ? "bottom-8" : "bottom-4"
+          }`}
           title="Center on my location"
+          aria-label="Center map on my location"
         >
           <Navigation className="w-4 h-4 text-primary" />
         </button>
