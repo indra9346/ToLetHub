@@ -123,7 +123,7 @@ const Navbar = () => {
       </AnimatePresence>
 
       {/* Mobile Bottom Nav */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 glass-strong border-t border-border/40 md:hidden">
+      <div className="bottom-nav fixed bottom-0 left-0 right-0 z-50 glass-strong border-t border-border/40 md:hidden">
         <div className="flex items-center justify-around py-2">
           {navItems.map((item) => {
             const isActive = location.pathname === item.path;
