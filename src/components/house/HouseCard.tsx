@@ -55,13 +55,14 @@ const HouseCard = ({ house, index = 0 }: HouseCardProps) => {
             {canFavorite && (
               <button
                 onClick={handleToggleFav}
+                disabled={toggleFav.isPending}
                 aria-label={isFav ? "Remove from favorites" : "Add to favorites"}
-                className="absolute top-3 right-3 w-9 h-9 rounded-full glass flex items-center justify-center transition-transform hover:scale-110"
+                className="absolute top-3 right-3 w-9 h-9 rounded-full glass flex items-center justify-center transition-transform hover:scale-110 disabled:opacity-60"
               >
                 <Heart
                   className={`w-4 h-4 transition-colors ${
                     isFav ? "fill-primary text-primary" : "text-foreground"
-                  }`}
+                  } ${toggleFav.isPending ? "animate-pulse" : ""}`}
                 />
               </button>
             )}
