@@ -10,8 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Slider } from "@/components/ui/slider";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useHouses, type House } from "@/hooks/useHouses";
-import { useGeolocation, getDistanceKm } from "@/hooks/useGeolocation";
-import { isGeolocationAllowedHere } from "@/hooks/useGeolocation";
+import { useGeolocation, getDistanceKm, isGeolocationAllowedHere } from "@/hooks/useGeolocation";
 import { toast } from "sonner";
 
 // Code-split the Leaflet map (heavy: leaflet + react-leaflet bundles)
