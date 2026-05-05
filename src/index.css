@@ -184,10 +184,20 @@
     filter: saturate(1.15);
   }
 
-  /* Leaflet override — keep map inside its container, never overflow */
+  /* Leaflet override — keep map inside its container and let Leaflet measure it correctly */
   .tolethub-map-shell {
-    contain: layout paint size;
+    position: relative;
+    width: 100%;
+    min-height: 320px;
+    contain: paint;
     touch-action: pan-x pan-y pinch-zoom;
+  }
+
+  .tolethub-map-shell .leaflet-map-pane,
+  .tolethub-map-shell .leaflet-tile-pane,
+  .tolethub-map-shell .leaflet-tile-container,
+  .tolethub-map-shell .leaflet-layer {
+    will-change: transform;
   }
 
   .tolethub-map-shell .leaflet-pane,
@@ -204,8 +214,10 @@
     height: 100% !important;
     z-index: 0;
   }
+  .leaflet-tile,
   .leaflet-tile-container img {
     max-width: none !important;
+    max-height: none !important;
   }
   @keyframes pulse {
     0% { transform: scale(1); opacity: 0.6; }
