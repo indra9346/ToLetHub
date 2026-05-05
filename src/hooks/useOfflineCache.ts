@@ -1,7 +1,7 @@
 import { openDB } from "idb";
 
 const DB_NAME = "tolethub-offline";
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 
 const getDB = () =>
   openDB(DB_NAME, DB_VERSION, {
@@ -11,6 +11,9 @@ const getDB = () =>
       }
       if (!db.objectStoreNames.contains("meta")) {
         db.createObjectStore("meta", { keyPath: "key" });
+      }
+      if (!db.objectStoreNames.contains("house-detail")) {
+        db.createObjectStore("house-detail", { keyPath: "id" });
       }
     },
   });
@@ -48,6 +51,25 @@ export const getLastSyncTime = async (): Promise<number | null> => {
     const db = await getDB();
     const meta = await db.get("meta", "lastSync");
     return meta?.value ?? null;
+  } catch {
+    return null;
+  }
+};
+
+export const cacheHouseDetail = async (house: any) => {
+  if (!house?.id) return;
+  try {
+    const db = await getDB();
+    await db.put("house-detail", house);
+  } catch (e) {
+    console.warn("Failed to cache house detail:", e);
+  }
+};
+
+export const getCachedHouseDetail = async (id: string): Promise<any | null> => {
+  try {
+    const db = await getDB();
+    return (await db.get("house-detail", id)) ?? null;
   } catch {
     return null;
   }

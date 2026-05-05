@@ -20,6 +20,21 @@ interface UseGeolocationReturn {
 
 const POSITION_CACHE_KEY = "tolethub-last-position";
 
+/** True only on origins where browsers allow geolocation (https / localhost). */
+export const isGeolocationAllowedHere = (): boolean => {
+  if (typeof window === "undefined") return false;
+  if (!("geolocation" in navigator)) return false;
+  // Modern browsers expose this; fall back to origin checks.
+  if (typeof window.isSecureContext === "boolean") return window.isSecureContext;
+  const { protocol, hostname } = window.location;
+  return (
+    protocol === "https:" ||
+    hostname === "localhost" ||
+    hostname === "127.0.0.1" ||
+    hostname === "::1"
+  );
+};
+
 const cachePosition = (pos: GeoPosition) => {
   try {
     localStorage.setItem(POSITION_CACHE_KEY, JSON.stringify(pos));
@@ -46,6 +61,19 @@ export const useGeolocation = (): UseGeolocationReturn => {
   const startTracking = useCallback(() => {
     if (!navigator.geolocation) {
       setError("Geolocation is not supported by your browser");
+      return;
+    }
+    if (!isGeolocationAllowedHere()) {
+      setError(
+        "Live location is blocked because this page is served over HTTP. Open the site over HTTPS (or localhost) to enable GPS."
+      );
+      const cached = getCachedPosition();
+      if (cached) {
+        setPosition(cached);
+        positionRef.current = cached;
+        setIsTracking(false);
+      }
+      setLoading(false);
       return;
     }
 

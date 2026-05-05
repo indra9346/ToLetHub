@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { Tables, TablesInsert, TablesUpdate } from "@/integrations/supabase/types";
-import { cacheHouses, getCachedHouses } from "./useOfflineCache";
+import { cacheHouses, getCachedHouses, cacheHouseDetail, getCachedHouseDetail } from "./useOfflineCache";
 
 export type House = Tables<"houses">;
 export type HouseInsert = TablesInsert<"houses">;
@@ -17,6 +17,11 @@ export const useHouses = (filters?: {
   return useQuery({
     queryKey: ["houses", filters],
     queryFn: async () => {
+      // If we're offline, serve cached listings directly
+      if (typeof navigator !== "undefined" && !navigator.onLine) {
+        const cached = await getCachedHouses();
+        return cached ?? [];
+      }
       let query = supabase.from("houses").select("*").order("created_at", { ascending: false });
 
       if (filters?.status && filters.status !== "all") {
@@ -35,14 +40,16 @@ export const useHouses = (filters?: {
         query = query.or(`title.ilike.%${filters.search}%,address.ilike.%${filters.search}%`);
       }
 
-      const { data, error } = await query;
-      if (error) throw error;
-
-      // Cache for offline
-      if (data && data.length > 0) {
-        cacheHouses(data);
+      try {
+        const { data, error } = await query;
+        if (error) throw error;
+        if (data && data.length > 0) cacheHouses(data);
+        return data ?? [];
+      } catch (err) {
+        const cached = await getCachedHouses();
+        if (cached.length > 0) return cached;
+        throw err;
       }
-      return data ?? [];
     },
     placeholderData: (prev) => prev,
     retry: 1,
@@ -53,12 +60,21 @@ export const useHouse = (id: string) => {
   return useQuery({
     queryKey: ["house", id],
     queryFn: async () => {
+      if (typeof navigator !== "undefined" && !navigator.onLine) {
+        const cached = await getCachedHouseDetail(id);
+        if (cached) return cached;
+      }
       const { data, error } = await supabase
         .from("houses")
         .select("*")
         .eq("id", id)
         .maybeSingle();
-      if (error) throw error;
+      if (error) {
+        const cached = await getCachedHouseDetail(id);
+        if (cached) return cached;
+        throw error;
+      }
+      if (data) cacheHouseDetail(data);
       return data;
     },
     enabled: !!id,
