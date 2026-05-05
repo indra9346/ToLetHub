@@ -177,7 +177,7 @@ const LiveMapView = ({
   }, [satellite]);
 
   const wrapperClass = fullscreen
-    ? "!fixed inset-0 z-[2000] h-[100dvh] w-screen rounded-none bg-background"
+    ? "!fixed inset-0 !z-[10000] h-[100dvh] w-screen rounded-none bg-background"
     : `relative rounded-2xl ${className}`;
 
   return (
