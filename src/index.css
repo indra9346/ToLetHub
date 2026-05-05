@@ -170,6 +170,13 @@
     z-index: 1;
   }
 
+  body.map-fullscreen-active header,
+  body.map-fullscreen-active nav,
+  body.map-fullscreen-active [class*="bottom-nav"] {
+    visibility: hidden !important;
+    pointer-events: none !important;
+  }
+
   .page-backdrop-listings::before {
     background-position: center top;
   }
