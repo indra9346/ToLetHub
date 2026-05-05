@@ -122,8 +122,18 @@ const HouseDetail = () => {
                 </div>
                 <div className="flex gap-2">
                   {canFavorite && (
-                    <Button variant="outline" size="icon" onClick={toggleFav}>
-                      <Heart className={`w-4 h-4 ${isFav ? "fill-primary text-primary" : ""}`} />
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={toggleFav}
+                      disabled={toggleFavMutation.isPending}
+                      aria-label={isFav ? "Remove from favorites" : "Add to favorites"}
+                    >
+                      <Heart
+                        className={`w-4 h-4 ${isFav ? "fill-primary text-primary" : ""} ${
+                          toggleFavMutation.isPending ? "animate-pulse" : ""
+                        }`}
+                      />
                     </Button>
                   )}
                   <Button variant="outline" size="icon"><Share2 className="w-4 h-4" /></Button>
