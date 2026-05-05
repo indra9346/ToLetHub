@@ -193,7 +193,6 @@
 
   /* Leaflet override — keep map inside its container and let Leaflet measure it correctly */
   .tolethub-map-shell {
-    position: relative;
     width: 100%;
     min-height: 320px;
     contain: paint;
