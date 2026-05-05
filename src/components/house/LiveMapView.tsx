@@ -149,9 +149,11 @@ const LiveMapView = ({
       });
     };
     const timers = [80, 280, 700].map((delay) => window.setTimeout(refreshMap, delay));
-    if (!fullscreen) return;
+    if (!fullscreen) return () => timers.forEach(window.clearTimeout);
     const prev = document.body.style.overflow;
+    const prevHtml = document.documentElement.style.overflow;
     document.body.style.overflow = "hidden";
+    document.documentElement.style.overflow = "hidden";
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") setFullscreen(false);
     };
@@ -159,6 +161,7 @@ const LiveMapView = ({
     return () => {
       timers.forEach(window.clearTimeout);
       document.body.style.overflow = prev;
+      document.documentElement.style.overflow = prevHtml;
       window.removeEventListener("keydown", onKey);
     };
   }, [fullscreen]);
@@ -174,13 +177,13 @@ const LiveMapView = ({
   }, [satellite]);
 
   const wrapperClass = fullscreen
-    ? "fixed inset-0 z-[2000] rounded-none bg-background"
-    : `rounded-2xl ${className}`;
+    ? "!fixed inset-0 z-[2000] h-[100dvh] w-screen rounded-none bg-background"
+    : `relative rounded-2xl ${className}`;
 
   return (
     <div
       ref={hostRef}
-      className={`tolethub-map-shell overflow-hidden relative isolate bg-secondary ${wrapperClass}`}
+      className={`tolethub-map-shell overflow-hidden isolate bg-secondary ${wrapperClass}`}
       style={{ boxShadow: "var(--card-shadow)" }}
     >
       <MapContainer
