@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState, type MutableRefObject, type RefObject } from "react";
-import { createPortal } from "react-dom";
 import { MapContainer, TileLayer, Marker, Popup, useMap, Circle, Polyline } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
@@ -155,6 +154,7 @@ const LiveMapView = ({
     const prevHtml = document.documentElement.style.overflow;
     document.body.style.overflow = "hidden";
     document.documentElement.style.overflow = "hidden";
+    document.body.classList.add("map-fullscreen-active");
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") setFullscreen(false);
     };
@@ -163,6 +163,7 @@ const LiveMapView = ({
       timers.forEach(window.clearTimeout);
       document.body.style.overflow = prev;
       document.documentElement.style.overflow = prevHtml;
+      document.body.classList.remove("map-fullscreen-active");
       window.removeEventListener("keydown", onKey);
     };
   }, [fullscreen]);
@@ -177,12 +178,12 @@ const LiveMapView = ({
     return () => window.clearTimeout(timer);
   }, [satellite]);
 
-  const mapContent = (
+  return (
     <div
       ref={hostRef}
       className={`tolethub-map-shell overflow-hidden isolate bg-secondary ${
         fullscreen
-          ? "fixed inset-0 z-[10000] h-[100dvh] w-screen rounded-none bg-background"
+          ? "fixed inset-0 z-[2000] h-[100dvh] w-screen rounded-none bg-background"
           : `relative rounded-2xl ${className}`
       }`}
       style={{ boxShadow: "var(--card-shadow)" }}
@@ -352,8 +353,6 @@ const LiveMapView = ({
       )}
     </div>
   );
-
-  return fullscreen && typeof document !== "undefined" ? createPortal(mapContent, document.body) : mapContent;
 };
 
 export default LiveMapView;
