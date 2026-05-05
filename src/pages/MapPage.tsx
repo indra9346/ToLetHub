@@ -11,6 +11,7 @@ import { Slider } from "@/components/ui/slider";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useHouses, type House } from "@/hooks/useHouses";
 import { useGeolocation, getDistanceKm } from "@/hooks/useGeolocation";
+import { isGeolocationAllowedHere } from "@/hooks/useGeolocation";
 import { toast } from "sonner";
 
 // Code-split the Leaflet map (heavy: leaflet + react-leaflet bundles)
@@ -187,7 +188,18 @@ const MapPage = () => {
               <span className="flex items-center gap-2">
                 <MapPin className="w-4 h-4 shrink-0" /> {geo.error}
               </span>
-              <Button variant="ghost" size="sm" onClick={geo.startTracking} className="text-xs shrink-0">Retry</Button>
+              {isGeolocationAllowedHere() ? (
+                <Button variant="ghost" size="sm" onClick={geo.startTracking} className="text-xs shrink-0">
+                  Retry
+                </Button>
+              ) : (
+                <a
+                  href={typeof window !== "undefined" ? window.location.href.replace(/^http:/, "https:") : "#"}
+                  className="text-xs underline shrink-0"
+                >
+                  Open over HTTPS
+                </a>
+              )}
             </div>
           )}
         </motion.div>
