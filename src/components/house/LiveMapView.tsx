@@ -75,20 +75,33 @@ const MapViewportFix = ({ hostRef }: { hostRef: RefObject<HTMLDivElement> }) => 
   const map = useMap();
 
   useEffect(() => {
-    const refresh = () => map.invalidateSize({ animate: false, pan: false });
+    let frame = 0;
+    const refresh = () => {
+      window.cancelAnimationFrame(frame);
+      frame = window.requestAnimationFrame(() => {
+        map.invalidateSize({ animate: false, pan: false });
+        map.eachLayer((layer) => {
+          if (layer instanceof L.TileLayer) layer.redraw();
+        });
+      });
+    };
     const host = hostRef.current;
     const observer = host ? new ResizeObserver(refresh) : null;
     if (host && observer) observer.observe(host);
 
     const timer = window.setTimeout(refresh, 150);
-    map.on("zoomend moveend layeradd", refresh);
+    const lateTimer = window.setTimeout(refresh, 650);
+    map.whenReady(refresh);
+    map.on("zoomend moveend layeradd load", refresh);
     window.addEventListener("orientationchange", refresh);
     window.addEventListener("resize", refresh);
 
     return () => {
+      window.cancelAnimationFrame(frame);
       window.clearTimeout(timer);
+      window.clearTimeout(lateTimer);
       observer?.disconnect();
-      map.off("zoomend moveend layeradd", refresh);
+      map.off("zoomend moveend layeradd load", refresh);
       window.removeEventListener("orientationchange", refresh);
       window.removeEventListener("resize", refresh);
     };
@@ -129,6 +142,7 @@ const LiveMapView = ({
 
   // Lock body scroll when fullscreen + ESC to exit
   useEffect(() => {
+    window.setTimeout(() => mapRef.current?.invalidateSize({ animate: false, pan: false }), 80);
     if (!fullscreen) return;
     const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
