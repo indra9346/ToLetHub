@@ -78,12 +78,47 @@ const MapViewportFix = ({ hostRef }: { hostRef: RefObject<HTMLDivElement> }) => 
   return null;
 };
 
+const useStableMapHost = (hostRef: RefObject<HTMLDivElement>) => {
+  const [size, setSize] = useState({ width: 0, height: 0 });
+
+  useEffect(() => {
+    const host = hostRef.current;
+    if (!host) return;
+    let frame = 0;
+    const measure = () => {
+      window.cancelAnimationFrame(frame);
+      frame = window.requestAnimationFrame(() => {
+        const rect = host.getBoundingClientRect();
+        setSize({ width: Math.round(rect.width), height: Math.round(rect.height) });
+      });
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(host);
+    window.addEventListener("resize", measure);
+    window.addEventListener("orientationchange", measure);
+    return () => {
+      window.cancelAnimationFrame(frame);
+      observer.disconnect();
+      window.removeEventListener("resize", measure);
+      window.removeEventListener("orientationchange", measure);
+    };
+  }, [hostRef]);
+
+  return {
+    ready: size.width >= 280 && size.height >= 300,
+    key: `${size.width}x${size.height}`,
+  };
+};
+
 const MapView = ({ houses, center = [12.9716, 77.5946], zoom = 12, className = "h-[400px]", singleMarker = false }: MapViewProps) => {
   const hostRef = useRef<HTMLDivElement | null>(null);
+  const { ready: mapReady, key: mapSizeKey } = useStableMapHost(hostRef);
 
   return (
     <div ref={hostRef} className={`tolethub-map-shell rounded-xl overflow-hidden border border-border bg-secondary ${className}`}>
-      <MapContainer center={center} zoom={zoom} className="w-full h-full" scrollWheelZoom zoomControl={false} attributionControl={false}>
+      {mapReady ? (
+      <MapContainer key={mapSizeKey} center={center} zoom={zoom} className="w-full h-full" scrollWheelZoom zoomControl={false} attributionControl={false} preferCanvas>
         <MapViewportFix hostRef={hostRef} />
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
@@ -116,6 +151,11 @@ const MapView = ({ houses, center = [12.9716, 77.5946], zoom = 12, className = "
           </Marker>
         ))}
       </MapContainer>
+      ) : (
+        <div className="w-full h-full min-h-[300px] flex items-center justify-center text-sm text-muted-foreground">
+          Loading map…
+        </div>
+      )}
     </div>
   );
 };
