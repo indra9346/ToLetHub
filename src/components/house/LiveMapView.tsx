@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type MutableRefObject, type RefObject } from "react";
+import { useEffect, useMemo, useRef, useState, type MutableRefObject, type RefObject } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMap, Circle, Polyline } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
@@ -87,6 +87,9 @@ const MapViewportFix = ({ hostRef }: { hostRef: RefObject<HTMLDivElement> }) => 
         const c = map.getCenter();
         const z = map.getZoom();
         map.setView(c, z, { animate: false });
+        map.eachLayer((layer) => {
+          if (layer instanceof L.TileLayer) layer.redraw();
+        });
       });
     };
     const host = hostRef.current;
@@ -97,7 +100,6 @@ const MapViewportFix = ({ hostRef }: { hostRef: RefObject<HTMLDivElement> }) => 
     // lazy mount, font/image reflows, and orientation changes.
     const timers = [0, 60, 200, 500, 1000, 1800].map((d) => window.setTimeout(refresh, d));
     map.whenReady(refresh);
-    map.on("zoomend moveend layeradd load", refresh);
     window.addEventListener("orientationchange", refresh);
     window.addEventListener("resize", refresh);
     document.addEventListener("visibilitychange", refresh);
@@ -106,7 +108,6 @@ const MapViewportFix = ({ hostRef }: { hostRef: RefObject<HTMLDivElement> }) => 
       window.cancelAnimationFrame(frame);
       timers.forEach(window.clearTimeout);
       observer?.disconnect();
-      map.off("zoomend moveend layeradd load", refresh);
       window.removeEventListener("orientationchange", refresh);
       window.removeEventListener("resize", refresh);
       document.removeEventListener("visibilitychange", refresh);
@@ -129,6 +130,42 @@ const MapRefBinder = ({ mapRef }: { mapRef: MutableRefObject<L.Map | null> }) =>
   return null;
 };
 
+const useStableMapHost = (hostRef: RefObject<HTMLDivElement>, fullscreen: boolean) => {
+  const [size, setSize] = useState({ width: 0, height: 0 });
+
+  useEffect(() => {
+    const host = hostRef.current;
+    if (!host) return;
+
+    let frame = 0;
+    const measure = () => {
+      window.cancelAnimationFrame(frame);
+      frame = window.requestAnimationFrame(() => {
+        const rect = host.getBoundingClientRect();
+        setSize({ width: Math.round(rect.width), height: Math.round(rect.height) });
+      });
+    };
+
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(host);
+    window.addEventListener("orientationchange", measure);
+    window.addEventListener("resize", measure);
+
+    return () => {
+      window.cancelAnimationFrame(frame);
+      observer.disconnect();
+      window.removeEventListener("orientationchange", measure);
+      window.removeEventListener("resize", measure);
+    };
+  }, [hostRef, fullscreen]);
+
+  return {
+    ready: size.width >= 280 && size.height >= 320,
+    key: `${fullscreen ? "full" : "page"}-${size.width}x${size.height}`,
+  };
+};
+
 const LiveMapView = ({
   houses,
   userPosition,
@@ -142,9 +179,26 @@ const LiveMapView = ({
   const [fullscreen, setFullscreen] = useState(false);
   const mapRef = useRef<L.Map | null>(null);
   const hostRef = useRef<HTMLDivElement | null>(null);
+  const { ready: mapReady, key: mapSizeKey } = useStableMapHost(hostRef, fullscreen);
   const center: [number, number] = userPosition
     ? [userPosition.lat, userPosition.lng]
     : [12.9716, 77.5946];
+  const mapOptions = useMemo(
+    () => ({
+      center,
+      zoom: userPosition ? 15 : 14,
+      minZoom: 3,
+      maxZoom: 19,
+      scrollWheelZoom: true,
+      zoomControl: false,
+      attributionControl: false,
+      zoomSnap: 0.5,
+      zoomDelta: 0.5,
+      wheelPxPerZoomLevel: 80,
+      worldCopyJump: true,
+    }),
+    [center[0], center[1], userPosition]
+  );
 
   // Lock body scroll when fullscreen + ESC to exit
   useEffect(() => {
@@ -194,19 +248,13 @@ const LiveMapView = ({
       }`}
       style={{ boxShadow: "var(--card-shadow)" }}
     >
+      {mapReady ? (
+        <>
       <MapContainer
-        center={center}
-        zoom={14}
-        minZoom={3}
-        maxZoom={19}
+        key={mapSizeKey}
+        {...mapOptions}
         className="w-full h-full"
-        scrollWheelZoom
-        zoomControl={false}
-        attributionControl={false}
-        zoomSnap={0.5}
-        zoomDelta={0.5}
-        wheelPxPerZoomLevel={80}
-        worldCopyJump
+        preferCanvas
       >
         <MapViewportFix hostRef={hostRef} />
         <MapRefBinder mapRef={mapRef} />
@@ -356,6 +404,12 @@ const LiveMapView = ({
         >
           <Navigation className="w-4 h-4 text-primary" />
         </button>
+      )}
+        </>
+      ) : (
+        <div className="w-full h-full min-h-[320px] flex items-center justify-center text-sm text-muted-foreground">
+          Loading map…
+        </div>
       )}
     </div>
   );
