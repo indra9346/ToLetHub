@@ -219,7 +219,7 @@ const MapPage = () => {
               <LiveMapView
                 houses={(houses ?? []) as any}
                 userPosition={geo.position}
-                className="h-[58vh] min-h-[360px] max-h-[640px] md:h-[calc(100vh-220px)]"
+                className="h-[60dvh] min-h-[380px] max-h-[720px] md:h-[calc(100dvh-220px)]"
                 selectedHouseId={selectedHouseId}
                 onSelectHouse={(id) => {
                   if (id && geo.position) {
