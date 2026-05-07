@@ -249,6 +249,7 @@ const LiveMapView = ({
       style={{ boxShadow: "var(--card-shadow)" }}
     >
       {mapReady ? (
+        <>
       <MapContainer
         key={mapSizeKey}
         {...mapOptions}
@@ -404,6 +405,7 @@ const LiveMapView = ({
           <Navigation className="w-4 h-4 text-primary" />
         </button>
       )}
+        </>
       ) : (
         <div className="w-full h-full min-h-[320px] flex items-center justify-center text-sm text-muted-foreground">
           Loading map…
