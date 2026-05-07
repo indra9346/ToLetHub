@@ -80,9 +80,13 @@ const MapViewportFix = ({ hostRef }: { hostRef: RefObject<HTMLDivElement> }) => 
       window.cancelAnimationFrame(frame);
       frame = window.requestAnimationFrame(() => {
         map.invalidateSize({ animate: false, pan: false });
-        map.eachLayer((layer) => {
-          if (layer instanceof L.TileLayer) layer.redraw();
-        });
+        // Force a real re-fetch of tiles for the new viewport.
+        // invalidateSize alone does NOT request missing tiles on mobile
+        // when the container grows after the initial sizing — re-applying
+        // the view nudges Leaflet to load tiles for the full bounds.
+        const c = map.getCenter();
+        const z = map.getZoom();
+        map.setView(c, z, { animate: false });
       });
     };
     const host = hostRef.current;
