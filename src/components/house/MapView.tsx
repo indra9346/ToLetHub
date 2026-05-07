@@ -50,9 +50,9 @@ const MapViewportFix = ({ hostRef }: { hostRef: RefObject<HTMLDivElement> }) => 
       window.cancelAnimationFrame(frame);
       frame = window.requestAnimationFrame(() => {
         map.invalidateSize({ animate: false, pan: false });
-        map.eachLayer((layer) => {
-          if (layer instanceof L.TileLayer) layer.redraw();
-        });
+        const c = map.getCenter();
+        const z = map.getZoom();
+        map.setView(c, z, { animate: false });
       });
     };
     const host = hostRef.current;
