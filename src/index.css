@@ -195,8 +195,8 @@
   .tolethub-map-shell {
     width: 100%;
     min-height: 320px;
-    contain: paint;
     touch-action: pan-x pan-y pinch-zoom;
+    -webkit-tap-highlight-color: transparent;
   }
 
   .tolethub-map-shell .leaflet-map-pane,

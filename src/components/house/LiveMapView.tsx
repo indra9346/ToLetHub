@@ -89,21 +89,23 @@ const MapViewportFix = ({ hostRef }: { hostRef: RefObject<HTMLDivElement> }) => 
     const observer = host ? new ResizeObserver(refresh) : null;
     if (host && observer) observer.observe(host);
 
-    const timer = window.setTimeout(refresh, 150);
-    const lateTimer = window.setTimeout(refresh, 650);
+    // Multiple staggered refreshes to handle mobile address bar resize,
+    // lazy mount, font/image reflows, and orientation changes.
+    const timers = [0, 60, 200, 500, 1000, 1800].map((d) => window.setTimeout(refresh, d));
     map.whenReady(refresh);
     map.on("zoomend moveend layeradd load", refresh);
     window.addEventListener("orientationchange", refresh);
     window.addEventListener("resize", refresh);
+    document.addEventListener("visibilitychange", refresh);
 
     return () => {
       window.cancelAnimationFrame(frame);
-      window.clearTimeout(timer);
-      window.clearTimeout(lateTimer);
+      timers.forEach(window.clearTimeout);
       observer?.disconnect();
       map.off("zoomend moveend layeradd load", refresh);
       window.removeEventListener("orientationchange", refresh);
       window.removeEventListener("resize", refresh);
+      document.removeEventListener("visibilitychange", refresh);
     };
   }, [hostRef, map]);
 
