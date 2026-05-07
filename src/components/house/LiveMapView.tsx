@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type MutableRefObject, type RefObject } from "react";
+import { useEffect, useMemo, useRef, useState, type MutableRefObject, type RefObject } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMap, Circle, Polyline } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
@@ -87,6 +87,9 @@ const MapViewportFix = ({ hostRef }: { hostRef: RefObject<HTMLDivElement> }) => 
         const c = map.getCenter();
         const z = map.getZoom();
         map.setView(c, z, { animate: false });
+        map.eachLayer((layer) => {
+          if (layer instanceof L.TileLayer) layer.redraw();
+        });
       });
     };
     const host = hostRef.current;
@@ -97,7 +100,6 @@ const MapViewportFix = ({ hostRef }: { hostRef: RefObject<HTMLDivElement> }) => 
     // lazy mount, font/image reflows, and orientation changes.
     const timers = [0, 60, 200, 500, 1000, 1800].map((d) => window.setTimeout(refresh, d));
     map.whenReady(refresh);
-    map.on("zoomend moveend layeradd load", refresh);
     window.addEventListener("orientationchange", refresh);
     window.addEventListener("resize", refresh);
     document.addEventListener("visibilitychange", refresh);
@@ -106,7 +108,6 @@ const MapViewportFix = ({ hostRef }: { hostRef: RefObject<HTMLDivElement> }) => 
       window.cancelAnimationFrame(frame);
       timers.forEach(window.clearTimeout);
       observer?.disconnect();
-      map.off("zoomend moveend layeradd load", refresh);
       window.removeEventListener("orientationchange", refresh);
       window.removeEventListener("resize", refresh);
       document.removeEventListener("visibilitychange", refresh);
