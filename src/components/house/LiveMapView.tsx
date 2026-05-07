@@ -248,19 +248,12 @@ const LiveMapView = ({
       }`}
       style={{ boxShadow: "var(--card-shadow)" }}
     >
+      {mapReady ? (
       <MapContainer
-        center={center}
-        zoom={14}
-        minZoom={3}
-        maxZoom={19}
+        key={mapSizeKey}
+        {...mapOptions}
         className="w-full h-full"
-        scrollWheelZoom
-        zoomControl={false}
-        attributionControl={false}
-        zoomSnap={0.5}
-        zoomDelta={0.5}
-        wheelPxPerZoomLevel={80}
-        worldCopyJump
+        preferCanvas
       >
         <MapViewportFix hostRef={hostRef} />
         <MapRefBinder mapRef={mapRef} />
@@ -410,6 +403,11 @@ const LiveMapView = ({
         >
           <Navigation className="w-4 h-4 text-primary" />
         </button>
+      )}
+      ) : (
+        <div className="w-full h-full min-h-[320px] flex items-center justify-center text-sm text-muted-foreground">
+          Loading map…
+        </div>
       )}
     </div>
   );
