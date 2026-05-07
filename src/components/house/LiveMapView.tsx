@@ -130,6 +130,42 @@ const MapRefBinder = ({ mapRef }: { mapRef: MutableRefObject<L.Map | null> }) =>
   return null;
 };
 
+const useStableMapHost = (hostRef: RefObject<HTMLDivElement>, fullscreen: boolean) => {
+  const [size, setSize] = useState({ width: 0, height: 0 });
+
+  useEffect(() => {
+    const host = hostRef.current;
+    if (!host) return;
+
+    let frame = 0;
+    const measure = () => {
+      window.cancelAnimationFrame(frame);
+      frame = window.requestAnimationFrame(() => {
+        const rect = host.getBoundingClientRect();
+        setSize({ width: Math.round(rect.width), height: Math.round(rect.height) });
+      });
+    };
+
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(host);
+    window.addEventListener("orientationchange", measure);
+    window.addEventListener("resize", measure);
+
+    return () => {
+      window.cancelAnimationFrame(frame);
+      observer.disconnect();
+      window.removeEventListener("orientationchange", measure);
+      window.removeEventListener("resize", measure);
+    };
+  }, [hostRef, fullscreen]);
+
+  return {
+    ready: size.width >= 280 && size.height >= 320,
+    key: `${fullscreen ? "full" : "page"}-${size.width}x${size.height}`,
+  };
+};
+
 const LiveMapView = ({
   houses,
   userPosition,
@@ -143,9 +179,26 @@ const LiveMapView = ({
   const [fullscreen, setFullscreen] = useState(false);
   const mapRef = useRef<L.Map | null>(null);
   const hostRef = useRef<HTMLDivElement | null>(null);
+  const { ready: mapReady, key: mapSizeKey } = useStableMapHost(hostRef, fullscreen);
   const center: [number, number] = userPosition
     ? [userPosition.lat, userPosition.lng]
     : [12.9716, 77.5946];
+  const mapOptions = useMemo(
+    () => ({
+      center,
+      zoom: userPosition ? 15 : 14,
+      minZoom: 3,
+      maxZoom: 19,
+      scrollWheelZoom: true,
+      zoomControl: false,
+      attributionControl: false,
+      zoomSnap: 0.5,
+      zoomDelta: 0.5,
+      wheelPxPerZoomLevel: 80,
+      worldCopyJump: true,
+    }),
+    [center[0], center[1], userPosition]
+  );
 
   // Lock body scroll when fullscreen + ESC to exit
   useEffect(() => {
