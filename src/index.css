@@ -253,3 +253,132 @@
     background: var(--glass-bg-strong) !important;
   }
 }
+
+
+/* ===== MAP PERFORMANCE FIX ===== */
+
+.leaflet-container {
+  width: 100%;
+  height: 100%;
+  background: #101418 !important;
+}
+
+.leaflet-tile {
+  image-rendering: auto;
+  visibility: inherit !important;
+}
+
+.leaflet-control-attribution {
+  display: none !important;
+}
+
+.leaflet-pane {
+  z-index: 1 !important;
+}
+
+.leaflet-top,
+.leaflet-bottom {
+  z-index: 999 !important;
+}
+
+.leaflet-popup-content-wrapper {
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.leaflet-popup-content {
+  margin: 10px;
+}
+
+.leaflet-popup-tip {
+  background: #111827;
+}
+
+/* Prevent grey tiles */
+
+.leaflet-container img {
+  max-width: none !important;
+}
+
+/* smoother mobile scrolling */
+
+.leaflet-touch {
+  touch-action: pan-x pan-y !important;
+}
+
+/* Fix fullscreen */
+
+body.map-fullscreen-active {
+  overflow: hidden;
+}
+
+/* ===== FINAL MAP FIX ===== */
+
+html,
+body,
+#root {
+  width: 100%;
+  height: 100%;
+}
+
+.tolethub-map-shell {
+  width: 100%;
+  min-height: 320px;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.leaflet-container {
+  width: 100% !important;
+  height: 100% !important;
+  background: #101418 !important;
+}
+
+.leaflet-pane,
+.leaflet-tile,
+.leaflet-marker-icon,
+.leaflet-marker-shadow,
+.leaflet-pane > canvas,
+.leaflet-pane > svg {
+  will-change: transform;
+}
+
+.leaflet-tile {
+  visibility: inherit !important;
+  max-width: none !important;
+  max-height: none !important;
+}
+
+.leaflet-container img {
+  max-width: none !important;
+}
+
+.leaflet-control-attribution {
+  display: none !important;
+}
+
+.leaflet-top,
+.leaflet-bottom {
+  z-index: 999 !important;
+}
+
+.leaflet-popup-content-wrapper {
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.leaflet-popup-content {
+  margin: 10px;
+}
+
+.leaflet-popup-tip {
+  background: #111827;
+}
+
+.leaflet-touch {
+  touch-action: pan-x pan-y !important;
+}
+
+body.map-fullscreen-active {
+  overflow: hidden;
+}
