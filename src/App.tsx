@@ -1,4 +1,4 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, type ReactElement } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -28,7 +28,7 @@ const RouteFallback = () => (
   </div>
 );
 
-const OwnerRoute = ({ children }: { children: JSX.Element }) => {
+const OwnerRoute = ({ children }: { children: ReactElement }) => {
   const { user, isAdmin, loading } = useAuth();
   if (loading) return <RouteFallback />;
   if (!user) return <Navigate to="/auth?mode=signup&role=owner" replace />;
@@ -36,7 +36,7 @@ const OwnerRoute = ({ children }: { children: JSX.Element }) => {
   return children;
 };
 
-const TenantRoute = ({ children }: { children: JSX.Element }) => {
+const TenantRoute = ({ children }: { children: ReactElement }) => {
   const { user, isAdmin, loading } = useAuth();
   if (loading) return <RouteFallback />;
   if (user && isAdmin) return <Navigate to="/admin" replace />;
