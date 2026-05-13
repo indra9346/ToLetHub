@@ -101,8 +101,9 @@ const Auth = () => {
       if (!result.redirected && !result.error) {
         navigate(role === "owner" ? "/admin" : "/listings", { replace: true });
       }
-    } catch (err: any) {
-      toast.error(err?.message || "Google sign-in failed. Please try email sign-in.");
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Google sign-in failed. Please try email sign-in.";
+      toast.error(message);
     } finally {
       setGoogleLoading(false);
     }
