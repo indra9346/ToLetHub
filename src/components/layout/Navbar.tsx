@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Home, Search, Heart, User, Menu, X, MapPin, LogIn, LayoutDashboard, LogOut, Plus } from "lucide-react";
+import { Home, Search, Heart, User, Menu, X, MapPin, LogIn, LayoutDashboard, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -12,7 +12,6 @@ const tenantBaseNavItems = [
 ];
 
 const ownerNavItems = [
-  { path: "/", label: "Home", icon: Home },
   { path: "/admin", label: "Dashboard", icon: LayoutDashboard },
 ];
 
