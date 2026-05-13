@@ -18,7 +18,7 @@ export const useHousesRealtime = () => {
         "postgres_changes",
         { event: "*", schema: "public", table: "houses" },
         (payload) => {
-          const changedId = (payload.new as any)?.id ?? (payload.old as any)?.id;
+          const changedId = (payload.new as Partial<House>)?.id ?? (payload.old as Partial<House>)?.id;
           qc.invalidateQueries({ queryKey: ["houses"] });
           qc.invalidateQueries({ queryKey: ["my-houses"] });
           if (changedId) qc.invalidateQueries({ queryKey: ["house", changedId] });
