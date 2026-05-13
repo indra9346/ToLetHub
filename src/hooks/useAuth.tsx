@@ -1,14 +1,16 @@
 import { createContext, useContext, useEffect, useState, useCallback, type ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import type { User, Session } from "@supabase/supabase-js";
+import type { AuthError, User, Session } from "@supabase/supabase-js";
+
+type ClaimOwnerRole = (fn: "claim_owner_role") => Promise<{ error: AuthError | null }>;
 
 interface AuthContextType {
   user: User | null;
   session: Session | null;
   loading: boolean;
   isAdmin: boolean;
-  signUp: (email: string, password: string, fullName: string, role?: "tenant" | "owner") => Promise<{ error: any }>;
-  signIn: (email: string, password: string) => Promise<{ error: any }>;
+  signUp: (email: string, password: string, fullName: string, role?: "tenant" | "owner") => Promise<{ error: AuthError | null }>;
+  signIn: (email: string, password: string) => Promise<{ error: AuthError | null }>;
   signOut: () => Promise<void>;
 }
 
@@ -24,7 +26,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const wantsOwner = localStorage.getItem("pending_owner_role") === "1";
 
     if (wantsOwner) {
-      const { error } = await (supabase as any).rpc("claim_owner_role");
+      const { error } = await (supabase.rpc as unknown as ClaimOwnerRole)("claim_owner_role");
       if (!error) localStorage.removeItem("pending_owner_role");
     }
 
@@ -76,7 +78,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     if (!error && role === "owner") {
       try {
         if (data.session?.user?.id) {
-          await (supabase as any).rpc("claim_owner_role");
+          await (supabase.rpc as unknown as ClaimOwnerRole)("claim_owner_role");
           await resolveRole(data.session.user.id);
         } else {
           localStorage.setItem("pending_owner_role", "1");
@@ -93,7 +95,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     // Apply pending owner role if signup happened before email confirm
     if (!error && data.user && localStorage.getItem("pending_owner_role") === "1") {
       try {
-        await (supabase as any).rpc("claim_owner_role");
+        await (supabase.rpc as unknown as ClaimOwnerRole)("claim_owner_role");
         await resolveRole(data.user.id);
       } catch {
         // ignore duplicates
