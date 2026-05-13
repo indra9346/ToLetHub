@@ -28,10 +28,22 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     // Single listener — fires immediately with INITIAL_SESSION, avoids double load
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
+      (event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
         if (session?.user) {
+          // Apply pending owner role (set before Google OAuth redirect)
+          if (event === "SIGNED_IN" && localStorage.getItem("pending_owner_role") === "1") {
+            const uid = session.user.id;
+            // fire-and-forget; don't block auth resolution
+            (async () => {
+              try {
+                await supabase.from("user_roles").insert({ user_id: uid, role: "admin" as any });
+              } catch { /* ignore duplicates */ }
+              localStorage.removeItem("pending_owner_role");
+              checkAdmin(uid);
+            })();
+          }
           checkAdmin(session.user.id);
         } else {
           setIsAdmin(false);
