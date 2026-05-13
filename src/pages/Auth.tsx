@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
-import { supabase } from "@/integrations/supabase/client";
+import { lovable } from "@/integrations/lovable/index";
 
 const Auth = () => {
   const [searchParams] = useSearchParams();
@@ -17,7 +17,7 @@ const Auth = () => {
   const [name, setName] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
-  const [role, setRole] = useState<"tenant" | "owner">("tenant");
+  const [role, setRole] = useState<"tenant" | "owner">(searchParams.get("role") === "owner" ? "owner" : "tenant");
   const { signIn, signUp, user, loading, isAdmin } = useAuth();
   const navigate = useNavigate();
 
@@ -75,7 +75,6 @@ const Auth = () => {
           }
         } else {
           toast.success("Welcome back!");
-          navigate("/listings");
         }
       }
     } finally {
@@ -92,16 +91,16 @@ const Auth = () => {
       } else if (isSignUp && role === "tenant") {
         localStorage.removeItem("pending_owner_role");
       }
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: "google",
-        options: {
-          redirectTo: window.location.origin,
-        },
+      const result = await lovable.auth.signInWithOAuth("google", {
+        redirect_uri: window.location.origin,
+        extraParams: { prompt: "select_account" },
       });
-      if (error) {
-        toast.error(error.message || "Google sign-in failed");
+      if (result.error) {
+        toast.error(result.error.message || "Google sign-in failed");
       }
-      // On success the browser will redirect to Google, no further action needed.
+      if (!result.redirected && !result.error) {
+        navigate(role === "owner" ? "/admin" : "/listings", { replace: true });
+      }
     } catch (err: any) {
       toast.error(err?.message || "Google sign-in failed. Please try email sign-in.");
     } finally {
