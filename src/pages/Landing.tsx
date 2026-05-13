@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Search, MapPin, Shield, Sparkles, ArrowRight } from "lucide-react";
+import { Search, MapPin, Shield, Sparkles, ArrowRight, LayoutDashboard, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import heroImage from "@/assets/tolethub-luxury-rentals.jpg";
 import heroVideo from "@/assets/tolethub-hero-loop.mp4";
@@ -18,7 +18,7 @@ const features = [
 
 const Landing = () => {
   const { data: houses } = useHouses({ status: "vacant" });
-  const { user } = useAuth();
+  const { user, isAdmin } = useAuth();
   const featured = (houses ?? []).slice(0, 3);
 
   return (
@@ -53,8 +53,17 @@ const Landing = () => {
               Discover thousands of verified rental properties on an interactive map. Browse, filter, and connect with owners instantly.
             </p>
             <div className="flex flex-col sm:flex-row gap-3">
-              <Link to="/listings"><Button size="lg" className="text-base px-8 gap-2 glow-primary"><Search className="w-5 h-5" />Browse Houses</Button></Link>
-              <Link to="/map"><Button size="lg" variant="outline" className="text-base px-8 gap-2 glass border-primary/30 hover:bg-primary/10"><MapPin className="w-5 h-5" />View on Map</Button></Link>
+              {isAdmin ? (
+                <>
+                  <Link to="/admin"><Button size="lg" className="text-base px-8 gap-2 glow-primary"><LayoutDashboard className="w-5 h-5" />Go to Dashboard</Button></Link>
+                  <Link to="/admin"><Button size="lg" variant="outline" className="text-base px-8 gap-2 glass border-primary/30 hover:bg-primary/10"><Plus className="w-5 h-5" />Add New Listing</Button></Link>
+                </>
+              ) : (
+                <>
+                  <Link to="/listings"><Button size="lg" className="text-base px-8 gap-2 glow-primary"><Search className="w-5 h-5" />Browse Houses</Button></Link>
+                  <Link to="/map"><Button size="lg" variant="outline" className="text-base px-8 gap-2 glass border-primary/30 hover:bg-primary/10"><MapPin className="w-5 h-5" />View on Map</Button></Link>
+                </>
+              )}
             </div>
             <div className="flex gap-8 mt-12">
               {[{ label: "Properties", value: "1,200+" }, { label: "Cities", value: "25+" }, { label: "Happy Tenants", value: "5,000+" }].map((stat) => (
@@ -87,8 +96,8 @@ const Landing = () => {
         </div>
       </section>
 
-      {/* Featured Listings */}
-      {featured.length > 0 && (
+      {/* Featured Listings — tenants only */}
+      {!isAdmin && featured.length > 0 && (
         <section className="py-20">
           <div className="container mx-auto px-4">
             <div className="flex items-center justify-between mb-10">
@@ -108,6 +117,7 @@ const Landing = () => {
       )}
 
       {/* CTA */}
+      {!isAdmin && (
       <section className="py-20 relative overflow-hidden">
         <div className="absolute inset-0 hero-gradient" />
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] rounded-full bg-primary/30 blur-3xl" />
@@ -126,6 +136,7 @@ const Landing = () => {
           </motion.div>
         </div>
       </section>
+      )}
 
       {/* Footer */}
       <footer className="bg-card border-t border-border py-10">
