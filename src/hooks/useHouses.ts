@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { Tables, TablesInsert, TablesUpdate } from "@/integrations/supabase/types";
@@ -6,6 +7,30 @@ import { cacheHouses, getCachedHouses, cacheHouseDetail, getCachedHouseDetail } 
 export type House = Tables<"houses">;
 export type HouseInsert = TablesInsert<"houses">;
 export type HouseUpdate = TablesUpdate<"houses">;
+
+export const useHousesRealtime = () => {
+  const qc = useQueryClient();
+
+  useEffect(() => {
+    const channel = supabase
+      .channel("houses-realtime-sync")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "houses" },
+        (payload) => {
+          const changedId = (payload.new as any)?.id ?? (payload.old as any)?.id;
+          qc.invalidateQueries({ queryKey: ["houses"] });
+          qc.invalidateQueries({ queryKey: ["my-houses"] });
+          if (changedId) qc.invalidateQueries({ queryKey: ["house", changedId] });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [qc]);
+};
 
 export const useHouses = (filters?: {
   search?: string;
