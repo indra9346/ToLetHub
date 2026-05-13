@@ -22,10 +22,10 @@ const Auth = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (user) {
+    if (!loading && user) {
       navigate(isAdmin ? "/admin" : "/listings", { replace: true });
     }
-  }, [user, isAdmin, navigate]);
+  }, [user, isAdmin, loading, navigate]);
 
   // Show loading while auth is restoring session
   if (loading || user) {
