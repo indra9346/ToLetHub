@@ -2,13 +2,16 @@ import { createContext, useContext, useEffect, useState, useCallback, type React
 import { supabase } from "@/integrations/supabase/client";
 import type { User, Session } from "@supabase/supabase-js";
 
+type AuthResult = { error: Error | null };
+type ClaimOwnerRole = (fn: "claim_owner_role") => Promise<AuthResult>;
+
 interface AuthContextType {
   user: User | null;
   session: Session | null;
   loading: boolean;
   isAdmin: boolean;
-  signUp: (email: string, password: string, fullName: string, role?: "tenant" | "owner") => Promise<{ error: any }>;
-  signIn: (email: string, password: string) => Promise<{ error: any }>;
+  signUp: (email: string, password: string, fullName: string, role?: "tenant" | "owner") => Promise<AuthResult>;
+  signIn: (email: string, password: string) => Promise<AuthResult>;
   signOut: () => Promise<void>;
 }
 
@@ -20,47 +23,47 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
 
-  const checkAdmin = useCallback((userId: string) => {
-    supabase.rpc("has_role", { _user_id: userId, _role: "admin" })
-      .then(({ data }) => setIsAdmin(!!data));
+  const resolveRole = useCallback(async (userId: string) => {
+    const wantsOwner = localStorage.getItem("pending_owner_role") === "1";
+
+    if (wantsOwner) {
+      const { error } = await (supabase.rpc as unknown as ClaimOwnerRole)("claim_owner_role");
+      if (!error) localStorage.removeItem("pending_owner_role");
+    }
+
+    const { data } = await supabase.rpc("has_role", { _user_id: userId, _role: "admin" });
+    setIsAdmin(!!data);
   }, []);
 
   useEffect(() => {
     // Single listener — fires immediately with INITIAL_SESSION, avoids double load
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
+      (_event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
         if (session?.user) {
-          // Apply pending owner role (set before Google OAuth redirect)
-          if (event === "SIGNED_IN" && localStorage.getItem("pending_owner_role") === "1") {
-            const uid = session.user.id;
-            // fire-and-forget; don't block auth resolution
-            (async () => {
-              try {
-                await supabase.from("user_roles").insert({ user_id: uid, role: "admin" as any });
-              } catch { /* ignore duplicates */ }
-              localStorage.removeItem("pending_owner_role");
-              checkAdmin(uid);
-            })();
-          }
-          checkAdmin(session.user.id);
+          setLoading(true);
+          resolveRole(session.user.id).finally(() => setLoading(false));
         } else {
           setIsAdmin(false);
+          setLoading(false);
         }
-        setLoading(false);
       }
     );
 
     // Safety: also fetch current session in case listener is slow
     supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession((prev) => prev ?? session);
-      setUser((prev) => prev ?? session?.user ?? null);
-      setLoading(false);
+      if (session?.user) {
+        setSession((prev) => prev ?? session);
+        setUser((prev) => prev ?? session.user);
+        resolveRole(session.user.id).finally(() => setLoading(false));
+      } else {
+        setLoading(false);
+      }
     });
 
     return () => subscription.unsubscribe();
-  }, [checkAdmin]);
+  }, [resolveRole]);
 
   const signUp = async (email: string, password: string, fullName: string, role: "tenant" | "owner" = "tenant") => {
     const { data, error } = await supabase.auth.signUp({
@@ -76,10 +79,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     if (!error && role === "owner") {
       try {
         if (data.session?.user?.id) {
-          await supabase.from("user_roles").insert({
-            user_id: data.session.user.id,
-            role: "admin" as any,
-          });
+          await (supabase.rpc as unknown as ClaimOwnerRole)("claim_owner_role");
+          await resolveRole(data.session.user.id);
         } else {
           localStorage.setItem("pending_owner_role", "1");
         }
@@ -95,10 +96,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     // Apply pending owner role if signup happened before email confirm
     if (!error && data.user && localStorage.getItem("pending_owner_role") === "1") {
       try {
-        await supabase.from("user_roles").insert({
-          user_id: data.user.id,
-          role: "admin" as any,
-        });
+        await (supabase.rpc as unknown as ClaimOwnerRole)("claim_owner_role");
+        await resolveRole(data.user.id);
       } catch {
         // ignore duplicates
       }

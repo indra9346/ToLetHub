@@ -3,21 +3,17 @@ import react from "@vitejs/plugin-react-swc";
 import path from "path";
 import { componentTagger } from "lovable-tagger";
 import { VitePWA } from "vite-plugin-pwa";
-import mkcert from "vite-plugin-mkcert";
 
 export default defineConfig(({ mode }) => ({
   server: {
-    host: "0.0.0.0",
-    port: 5173,
-    strictPort: false,
+    host: "::",
+    port: 8080,
     hmr: {
       overlay: false,
     },
   },
-
   plugins: [
     react(),
-    mkcert(),
     mode === "development" && componentTagger(),
     VitePWA({
       registerType: "autoUpdate",
@@ -44,11 +40,11 @@ export default defineConfig(({ mode }) => ({
             },
           },
           {
-            urlPattern: /^https:\/\/server\.arcgisonline\.com\/.*/i,
+            urlPattern: /^https:\/\/cdnjs\.cloudflare\.com\/.*/i,
             handler: "CacheFirst",
             options: {
-              cacheName: "satellite-tiles",
-              expiration: { maxEntries: 2000, maxAgeSeconds: 60 * 60 * 24 * 30 },
+              cacheName: "cdn-assets",
+              expiration: { maxEntries: 30, maxAgeSeconds: 60 * 60 * 24 * 30 },
               cacheableResponse: { statuses: [0, 200] },
             },
           },
@@ -77,9 +73,9 @@ export default defineConfig(({ mode }) => ({
       manifest: {
         name: "ToLetHub - Find Rental Homes",
         short_name: "ToLetHub",
-        description: "Find verified rental houses with live map view. Offline ready.",
-        theme_color: "#00ffd5",
-        background_color: "#081018",
+        description: "Find verified rental houses with live map view. Works offline.",
+        theme_color: "#e8572a",
+        background_color: "#f5f6f8",
         display: "standalone",
         orientation: "portrait",
         scope: "/",
@@ -92,7 +88,6 @@ export default defineConfig(({ mode }) => ({
       },
     }),
   ].filter(Boolean),
-
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),

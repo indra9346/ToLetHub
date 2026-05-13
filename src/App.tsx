@@ -1,14 +1,15 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, type ReactElement } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { Loader2 } from "lucide-react";
-import { AuthProvider } from "@/hooks/useAuth";
+import { AuthProvider, useAuth } from "@/hooks/useAuth";
 import Navbar from "@/components/layout/Navbar";
 import OnlineStatus from "@/components/layout/OnlineStatus";
 import SplashIntro from "@/components/layout/SplashIntro";
+import { useHousesRealtime } from "@/hooks/useHouses";
 import Landing from "./pages/Landing";
 
 // Lazy-loaded routes (code-split). Map + admin are heavy (Leaflet/charts).
@@ -26,6 +27,26 @@ const RouteFallback = () => (
     <Loader2 className="w-8 h-8 animate-spin text-primary" />
   </div>
 );
+
+const OwnerRoute = ({ children }: { children: ReactElement }) => {
+  const { user, isAdmin, loading } = useAuth();
+  if (loading) return <RouteFallback />;
+  if (!user) return <Navigate to="/auth?mode=signup&role=owner" replace />;
+  if (!isAdmin) return <Navigate to="/listings" replace />;
+  return children;
+};
+
+const TenantRoute = ({ children }: { children: ReactElement }) => {
+  const { user, isAdmin, loading } = useAuth();
+  if (loading) return <RouteFallback />;
+  if (user && isAdmin) return <Navigate to="/admin" replace />;
+  return children;
+};
+
+const RealtimeSync = () => {
+  useHousesRealtime();
+  return null;
+};
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -48,15 +69,16 @@ const App = () => (
           <SplashIntro />
           <Navbar />
           <OnlineStatus />
+          <RealtimeSync />
           <Suspense fallback={<RouteFallback />}>
             <Routes>
               <Route path="/" element={<Landing />} />
-              <Route path="/listings" element={<Listings />} />
-              <Route path="/house/:id" element={<HouseDetail />} />
-              <Route path="/map" element={<MapPage />} />
-              <Route path="/favorites" element={<Favorites />} />
+              <Route path="/listings" element={<TenantRoute><Listings /></TenantRoute>} />
+              <Route path="/house/:id" element={<TenantRoute><HouseDetail /></TenantRoute>} />
+              <Route path="/map" element={<TenantRoute><MapPage /></TenantRoute>} />
+              <Route path="/favorites" element={<TenantRoute><Favorites /></TenantRoute>} />
               <Route path="/auth" element={<Auth />} />
-              <Route path="/admin" element={<AdminDashboard />} />
+              <Route path="/admin" element={<OwnerRoute><AdminDashboard /></OwnerRoute>} />
               <Route path="/profile" element={<Profile />} />
               <Route path="*" element={<NotFound />} />
             </Routes>

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Home, Search, Heart, User, Menu, X, MapPin, LogIn, LayoutDashboard, LogOut, Plus } from "lucide-react";
+import { Home, Search, Heart, User, Menu, X, MapPin, LogIn, LayoutDashboard, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -12,15 +12,14 @@ const tenantBaseNavItems = [
 ];
 
 const ownerNavItems = [
-  { path: "/", label: "Home", icon: Home },
   { path: "/admin", label: "Dashboard", icon: LayoutDashboard },
 ];
 
 const Navbar = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
-  const { user, isAdmin, signOut } = useAuth();
-  const navItems = isAdmin
+  const { user, isAdmin, loading, signOut } = useAuth();
+  const navItems = loading ? [] : isAdmin
     ? ownerNavItems
     : [...tenantBaseNavItems, { path: "/favorites", label: "Favorites", icon: Heart }];
 
@@ -51,7 +50,7 @@ const Navbar = () => {
           </div>
 
           <div className="hidden md:flex items-center gap-2">
-            {user ? (
+            {loading ? null : user ? (
               <>
                 <Link to="/profile">
                   <Button variant="outline" size="sm" className="gap-1.5">
@@ -92,7 +91,7 @@ const Navbar = () => {
                 );
               })}
               <div className="border-t border-border mt-2 pt-2">
-                {user ? (
+                {loading ? null : user ? (
                   <div className="flex gap-2">
                     <Link to="/profile" className="flex-1" onClick={() => setMobileOpen(false)}>
                       <Button variant="outline" className="w-full">Profile</Button>
@@ -127,10 +126,12 @@ const Navbar = () => {
               </Link>
             );
           })}
-          <Link to={user ? "/profile" : "/auth"} className={`flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-lg transition-colors ${["/auth", "/profile"].includes(location.pathname) ? "text-primary" : "text-muted-foreground"}`}>
-            <User className="w-5 h-5" />
-            <span className="text-[10px] font-medium">{user ? "Profile" : "Account"}</span>
-          </Link>
+          {!loading && (
+            <Link to={user ? "/profile" : "/auth"} className={`flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-lg transition-colors ${["/auth", "/profile"].includes(location.pathname) ? "text-primary" : "text-muted-foreground"}`}>
+              <User className="w-5 h-5" />
+              <span className="text-[10px] font-medium">{user ? "Profile" : "Account"}</span>
+            </Link>
+          )}
         </div>
       </div>
     </>
