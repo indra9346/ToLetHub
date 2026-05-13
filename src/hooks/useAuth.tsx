@@ -1,16 +1,17 @@
 import { createContext, useContext, useEffect, useState, useCallback, type ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import type { AuthError, User, Session } from "@supabase/supabase-js";
+import type { User, Session } from "@supabase/supabase-js";
 
-type ClaimOwnerRole = (fn: "claim_owner_role") => Promise<{ error: AuthError | null }>;
+type AuthResult = { error: Error | null };
+type ClaimOwnerRole = (fn: "claim_owner_role") => Promise<AuthResult>;
 
 interface AuthContextType {
   user: User | null;
   session: Session | null;
   loading: boolean;
   isAdmin: boolean;
-  signUp: (email: string, password: string, fullName: string, role?: "tenant" | "owner") => Promise<{ error: AuthError | null }>;
-  signIn: (email: string, password: string) => Promise<{ error: AuthError | null }>;
+  signUp: (email: string, password: string, fullName: string, role?: "tenant" | "owner") => Promise<AuthResult>;
+  signIn: (email: string, password: string) => Promise<AuthResult>;
   signOut: () => Promise<void>;
 }
 
