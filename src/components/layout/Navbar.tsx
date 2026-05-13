@@ -1,21 +1,28 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Home, Search, Heart, User, Menu, X, MapPin, LogIn, LayoutDashboard, LogOut } from "lucide-react";
+import { Home, Search, Heart, User, Menu, X, MapPin, LogIn, LayoutDashboard, LogOut, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 
-const baseNavItems = [
+const tenantBaseNavItems = [
   { path: "/", label: "Home", icon: Home },
   { path: "/listings", label: "Browse", icon: Search },
   { path: "/map", label: "Map View", icon: MapPin },
+];
+
+const ownerNavItems = [
+  { path: "/", label: "Home", icon: Home },
+  { path: "/admin", label: "Dashboard", icon: LayoutDashboard },
 ];
 
 const Navbar = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
   const { user, isAdmin, signOut } = useAuth();
-  const navItems = isAdmin ? baseNavItems : [...baseNavItems, { path: "/favorites", label: "Favorites", icon: Heart }];
+  const navItems = isAdmin
+    ? ownerNavItems
+    : [...tenantBaseNavItems, { path: "/favorites", label: "Favorites", icon: Heart }];
 
   return (
     <>
@@ -41,13 +48,6 @@ const Navbar = () => {
                 </Link>
               );
             })}
-            {user && isAdmin && (
-              <Link to="/admin">
-                <Button variant={location.pathname === "/admin" ? "default" : "ghost"} size="sm" className={location.pathname === "/admin" ? "" : "text-muted-foreground hover:text-foreground"}>
-                  <LayoutDashboard className="w-4 h-4 mr-1.5" />Dashboard
-                </Button>
-              </Link>
-            )}
           </div>
 
           <div className="hidden md:flex items-center gap-2">
@@ -91,13 +91,6 @@ const Navbar = () => {
                   </Link>
                 );
               })}
-              {user && isAdmin && (
-                <Link to="/admin" onClick={() => setMobileOpen(false)}>
-                  <Button variant={location.pathname === "/admin" ? "default" : "ghost"} className="w-full justify-start">
-                    <LayoutDashboard className="w-4 h-4 mr-2" />Dashboard
-                  </Button>
-                </Link>
-              )}
               <div className="border-t border-border mt-2 pt-2">
                 {user ? (
                   <div className="flex gap-2">
