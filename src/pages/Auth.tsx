@@ -18,14 +18,14 @@ const Auth = () => {
   const [submitting, setSubmitting] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [role, setRole] = useState<"tenant" | "owner">("tenant");
-  const { signIn, signUp, user, loading } = useAuth();
+  const { signIn, signUp, user, loading, isAdmin } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
     if (user) {
-      navigate("/listings", { replace: true });
+      navigate(isAdmin ? "/admin" : "/listings", { replace: true });
     }
-  }, [user, navigate]);
+  }, [user, isAdmin, navigate]);
 
   // Show loading while auth is restoring session
   if (loading || user) {
@@ -86,6 +86,12 @@ const Auth = () => {
   const handleGoogleSignIn = async () => {
     setGoogleLoading(true);
     try {
+      // If signing up as owner, persist intent so it's applied after OAuth redirect
+      if (isSignUp && role === "owner") {
+        localStorage.setItem("pending_owner_role", "1");
+      } else if (isSignUp && role === "tenant") {
+        localStorage.removeItem("pending_owner_role");
+      }
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
