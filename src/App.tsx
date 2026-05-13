@@ -9,6 +9,7 @@ import { AuthProvider, useAuth } from "@/hooks/useAuth";
 import Navbar from "@/components/layout/Navbar";
 import OnlineStatus from "@/components/layout/OnlineStatus";
 import SplashIntro from "@/components/layout/SplashIntro";
+import { useHousesRealtime } from "@/hooks/useHouses";
 import Landing from "./pages/Landing";
 
 // Lazy-loaded routes (code-split). Map + admin are heavy (Leaflet/charts).
@@ -42,6 +43,11 @@ const TenantRoute = ({ children }: { children: JSX.Element }) => {
   return children;
 };
 
+const RealtimeSync = () => {
+  useHousesRealtime();
+  return null;
+};
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -63,6 +69,7 @@ const App = () => (
           <SplashIntro />
           <Navbar />
           <OnlineStatus />
+          <RealtimeSync />
           <Suspense fallback={<RouteFallback />}>
             <Routes>
               <Route path="/" element={<Landing />} />
