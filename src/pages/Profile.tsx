@@ -55,23 +55,26 @@ const Profile = () => {
           </div>
 
           <div className="space-y-3">
-            {isAdmin && (
+            {isAdmin ? (
               <Link to="/admin" className="block">
                 <Button variant="outline" className="w-full justify-start gap-3 h-12">
-                  <Settings className="w-4 h-4" /> Admin Dashboard
+                  <Settings className="w-4 h-4" /> Owner Dashboard
                 </Button>
               </Link>
+            ) : (
+              <>
+                <Link to="/favorites" className="block">
+                  <Button variant="outline" className="w-full justify-start gap-3 h-12">
+                    <Heart className="w-4 h-4" /> Saved Properties
+                  </Button>
+                </Link>
+                <Link to="/listings" className="block">
+                  <Button variant="outline" className="w-full justify-start gap-3 h-12">
+                    <Home className="w-4 h-4" /> Browse Listings
+                  </Button>
+                </Link>
+              </>
             )}
-            <Link to="/favorites" className="block">
-              <Button variant="outline" className="w-full justify-start gap-3 h-12">
-                <Heart className="w-4 h-4" /> Saved Properties
-              </Button>
-              </Link>
-            <Link to="/listings" className="block">
-              <Button variant="outline" className="w-full justify-start gap-3 h-12">
-                <Home className="w-4 h-4" /> Browse Listings
-              </Button>
-            </Link>
             <Button
               variant="outline"
               className="w-full justify-start gap-3 h-12 text-destructive hover:text-destructive"
