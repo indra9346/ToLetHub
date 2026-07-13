@@ -1,0 +1,85 @@
+<!-- Floating Trigger Button -->
+<button class="chat-trigger-btn" [class.active]="isOpen()" (click)="toggleChat()" aria-label="Open AI Assistant">
+  <span *ngIf="!isOpen()" class="icon">💬</span>
+  <span *ngIf="isOpen()" class="icon">✖</span>
+  <span class="pulse-indicator" *ngIf="!isOpen()"></span>
+</button>
+
+<!-- Premium Glassmorphism Chat Container -->
+<div class="chat-container glass-card" [class.open]="isOpen()">
+  <div class="chat-header">
+    <div class="header-brand">
+      <span class="bot-avatar">🤖</span>
+      <div class="title-meta">
+        <h3>ToLetHub Assistant</h3>
+        <span class="badge">AI Assistant</span>
+      </div>
+    </div>
+    <button class="btn-clear" (click)="clearConversation()" title="Clear Conversation">🧹</button>
+  </div>
+
+  <!-- Messages scroll area -->
+  <div class="chat-body" #scrollContainer>
+    <div class="chat-warning-banner" *ngIf="chatService.messages().length > 0 && chatService.messages()[chatService.messages().length - 1].isDemoMode">
+      <span>⚙️ Running in Demo Assistant Mode (Local Fallback)</span>
+    </div>
+
+    <div *ngFor="let msg of chatService.messages()" class="message-row" [class.user-row]="msg.sender === 'user'">
+      <div class="message-bubble" [class.assistant-bubble]="msg.sender === 'assistant'" [class.user-bubble]="msg.sender === 'user'">
+        <!-- Message content -->
+        <p class="message-text">{{ msg.text }}</p>
+
+        <!-- Listing card embeds inside bubble if present -->
+        <div class="listing-cards-grid" *ngIf="msg.listings && msg.listings.length > 0">
+          <div class="mini-listing-card" *ngFor="let list of msg.listings">
+            <img [src]="list.images && list.images[0] ? list.images[0] : 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=400&q=80'" alt="{{ list.title }}" class="card-img" />
+            <div class="card-details">
+              <h4>{{ list.title }}</h4>
+              <p class="locality">📍 {{ list.locality }}</p>
+              <div class="price-row">
+                <span class="rent">₹{{ list.rent | number }}/mo</span>
+                <a [routerLink]="['/explore/details', list.id]" (click)="isOpen.set(false)" class="btn-view-card">View</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Render suggested prompts chips (only for the last message in stream, if available) -->
+        <div class="chips-container" *ngIf="msg.suggestions && msg.suggestions.length > 0 && msg === chatService.messages()[chatService.messages().length - 1]">
+          <button *ngFor="let chip of msg.suggestions" class="prompt-chip" (click)="onChipClick(chip)">
+            {{ chip }}
+          </button>
+        </div>
+
+        <span class="message-time">{{ msg.timestamp | date:'shortTime' }}</span>
+      </div>
+    </div>
+
+    <!-- Animated typing indicator loader -->
+    <div class="message-row" *ngIf="chatService.isTyping()">
+      <div class="message-bubble assistant-bubble typing-bubble">
+        <span class="dot"></span>
+        <span class="dot"></span>
+        <span class="dot"></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="chat-footer">
+    <div class="input-row">
+      <input 
+        type="text" 
+        placeholder="Ask ToLetHub Assistant..." 
+        [(ngModel)]="userInput" 
+        (keyup.enter)="sendMessage()" 
+        maxlength="500" 
+        [disabled]="chatService.isTyping()"
+        class="chat-input"
+      />
+      <button class="btn-send" (click)="sendMessage()" [disabled]="chatService.isTyping() || !userInput().trim()" aria-label="Send message">
+        ➔
+      </button>
+    </div>
+    <span class="footer-note">Listing details may change. Please confirm availability and final terms with the owner. Information is based on listings available on ToLetHub.</span>
+  </div>
+</div>

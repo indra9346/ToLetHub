@@ -1,0 +1,133 @@
+.footer {
+  background-color: #0b0f19;
+  color: var(--text-light);
+  padding: 60px 0 30px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  font-size: 0.9rem;
+}
+
+.footer-container {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.footer-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1.5fr;
+  gap: 40px;
+  margin-bottom: 40px;
+}
+
+.footer-brand {
+  .logo-container {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-display);
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: var(--text-light);
+    margin-bottom: 16px;
+    
+    .logo-icon {
+      font-size: 1.6rem;
+    }
+    
+    .logo-highlight {
+      color: var(--primary);
+    }
+  }
+
+  .brand-desc {
+    color: var(--text-muted-dark);
+    line-height: 1.6;
+    max-width: 320px;
+  }
+}
+
+.footer-links-col {
+  h3 {
+    font-family: var(--font-display);
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 20px;
+    color: var(--text-light);
+    position: relative;
+    padding-bottom: 8px;
+    
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 30px;
+      height: 2px;
+      background: var(--primary);
+    }
+  }
+
+  ul {
+    list-style: none;
+    padding: 0;
+    
+    li {
+      margin-bottom: 12px;
+      
+      a {
+        color: var(--text-muted-dark);
+        transition: var(--transition-smooth);
+        
+        &:hover {
+          color: var(--primary);
+          padding-left: 4px;
+        }
+      }
+    }
+  }
+
+  .support-info {
+    color: var(--text-muted-dark);
+    line-height: 1.8;
+  }
+}
+
+.footer-bottom {
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  padding-top: 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  color: var(--text-muted-dark);
+  
+  .meta-note {
+    font-size: 0.8rem;
+    color: var(--primary);
+    background-color: rgba(217, 119, 6, 0.1);
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-family: var(--font-display);
+  }
+}
+
+/* Responsive view */
+@media (max-width: 992px) {
+  .footer-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 576px) {
+  .footer-grid {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+  
+  .footer-bottom {
+    flex-direction: column;
+    text-align: center;
+  }
+}

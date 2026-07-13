@@ -1,0 +1,240 @@
+<div class="explore-page">
+  <!-- Top Search Bar & Geolocation Panel -->
+  <div class="search-hero-bar glass-card">
+    <div class="location-picker">
+      <button *ngIf="!filters.lat" (click)="useMyLocation()" class="btn btn-primary btn-sm btn-gps">
+        📍 Find Near Me
+      </button>
+      <button *ngIf="filters.lat" (click)="clearLocationFilter()" class="btn btn-accent btn-sm btn-gps">
+        📍 Clear Radius
+      </button>
+      
+      <span class="location-status" *ngIf="filters.lat">
+        Radius:
+        <select [(ngModel)]="filters.radius" (change)="executeSearch()" class="radius-select">
+          <option value="2">2 km</option>
+          <option value="5">5 km</option>
+          <option value="10">10 km</option>
+          <option value="20">20 km</option>
+        </select>
+      </span>
+      <span class="location-denied-warning" *ngIf="geolocationService.permissionDenied()">
+        ⚠️ GPS denied. Using text search.
+      </span>
+    </div>
+
+    <!-- Quick keyword search input -->
+    <div class="keyword-search">
+      <input 
+        type="text" 
+        [(ngModel)]="filters.keyword" 
+        (keyup.enter)="executeSearch()" 
+        placeholder="Search keywords, locality, city..." 
+        class="form-control"
+      />
+      <button (click)="executeSearch()" class="btn btn-primary">Search</button>
+    </div>
+  </div>
+
+  <!-- Mobile Floating Filter Trigger -->
+  <button class="mobile-filter-trigger-btn btn btn-primary" (click)="isMobileFilterOpen.set(true)">
+    ⚙️ Filter & Sort Options
+  </button>
+
+  <div class="explore-layout">
+    
+    <!-- Mobile Filter Overlay Backdrop -->
+    <div class="mobile-filter-overlay" *ngIf="isMobileFilterOpen()" (click)="isMobileFilterOpen.set(false)" aria-hidden="true"></div>
+
+    <!-- Sidebar Filters Panel (Responsive Desktop Rail / Mobile Bottom Sheet) -->
+    <aside class="filters-sidebar glass-card" [class.mobile-open]="isMobileFilterOpen()">
+      <div class="sidebar-header">
+        <h3>Filter Stays</h3>
+        <button (click)="isMobileFilterOpen.set(false)" class="btn-close-filter-mobile" aria-label="Close filters">✕</button>
+        <button (click)="resetFilters()" class="btn-reset">Clear All</button>
+      </div>
+
+      <!-- City / Locality -->
+      <div class="filter-group">
+        <label for="filterCity">City</label>
+        <input id="filterCity" type="text" [(ngModel)]="filters.city" (change)="executeSearch()" placeholder="e.g. Bangalore" class="form-control" />
+      </div>
+
+      <div class="filter-group">
+        <label for="filterLocality">Locality</label>
+        <input id="filterLocality" type="text" [(ngModel)]="filters.locality" (change)="executeSearch()" placeholder="e.g. Koramangala" class="form-control" />
+      </div>
+
+      <!-- Property Category -->
+      <div class="filter-group">
+        <label for="filterType">Property Type</label>
+        <select id="filterType" [(ngModel)]="filters.propertyType" (change)="executeSearch()" class="form-control">
+          <option value="">All Categories</option>
+          <option value="PG">Paying Guest (PG)</option>
+          <option value="Room">Rental Room</option>
+          <option value="House">Independent House</option>
+        </select>
+      </div>
+
+      <!-- Rent Range -->
+      <div class="filter-group">
+        <label>Monthly Rent Range</label>
+        <div class="range-inputs">
+          <input type="number" aria-label="Minimum Rent" [(ngModel)]="filters.minRent" (change)="executeSearch()" placeholder="Min ₹" class="form-control" />
+          <span class="dash">-</span>
+          <input type="number" aria-label="Maximum Rent" [(ngModel)]="filters.maxRent" (change)="executeSearch()" placeholder="Max ₹" class="form-control" />
+        </div>
+      </div>
+
+      <!-- Gender preference -->
+      <div class="filter-group">
+        <label for="filterGender">Gender Preference</label>
+        <select id="filterGender" [(ngModel)]="filters.genderPreference" (change)="executeSearch()" class="form-control">
+          <option value="any">Any preferred</option>
+          <option value="boys">Boys preferred</option>
+          <option value="girls">Girls preferred</option>
+        </select>
+      </div>
+
+      <!-- Food Availability -->
+      <div class="filter-group">
+        <label for="filterFood">Food Included</label>
+        <select id="filterFood" [(ngModel)]="filters.foodAvailability" (change)="executeSearch()" class="form-control">
+          <option value="">Any Option</option>
+          <option value="true">Food Included</option>
+          <option value="false">No Food</option>
+        </select>
+      </div>
+
+      <!-- Furnishing Type -->
+      <div class="filter-group">
+        <label for="filterFurnishing">Furnishing Status</label>
+        <select id="filterFurnishing" [(ngModel)]="filters.furnishing" (change)="executeSearch()" class="form-control">
+          <option value="">Any Status</option>
+          <option value="unfurnished">Unfurnished</option>
+          <option value="semi-furnished">Semi-Furnished</option>
+          <option value="fully-furnished">Fully Furnished</option>
+        </select>
+      </div>
+
+      <!-- Amenities Checklist -->
+      <div class="filter-group">
+        <label>Amenities Provided</label>
+        <div class="amenities-checklist">
+          <label *ngFor="let am of amenitiesList" class="checklist-item">
+            <input type="checkbox" [checked]="filters.amenities.includes(am)" (change)="toggleAmenity(am); executeSearch()" />
+            <span>{{ am }}</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Available from date -->
+      <div class="filter-group">
+        <label for="filterAvailableDate">Available From Date</label>
+        <input id="filterAvailableDate" type="date" [(ngModel)]="filters.availableDate" (change)="executeSearch()" class="form-control" />
+      </div>
+
+      <!-- Mobile Apply button inside drawer -->
+      <div class="mobile-apply-footer">
+        <button class="btn btn-primary btn-block" (click)="isMobileFilterOpen.set(false)">Apply Filters</button>
+      </div>
+    </aside>
+
+    <!-- Main Results Column -->
+    <main class="results-container">
+      <!-- Listings Header: Sort + Count -->
+      <div class="results-header glass-card">
+        <div class="count-meta">
+          <h3>Available Stays</h3>
+          <p>{{ listings().length }} properties found</p>
+        </div>
+        
+        <div class="sort-picker">
+          <label for="sort-select">Sort by:</label>
+          <select id="sort-select" [(ngModel)]="filters.sortBy" (change)="executeSearch()" class="sort-select">
+            <option value="newest">Newest First</option>
+            <option value="lowestPrice">Price: Low to High</option>
+            <option *ngIf="filters.lat && filters.lng" value="nearest">Distance: Nearest First</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Active Filter Chips Bar -->
+      <div class="active-chips-bar" *ngIf="filters.propertyType || filters.genderPreference !== 'any' || filters.locality || filters.city">
+        <span class="chip-label">Filters active:</span>
+        <span class="filter-chip" *ngIf="filters.propertyType">
+          Type: {{ filters.propertyType }}
+        </span>
+        <span class="filter-chip" *ngIf="filters.genderPreference !== 'any'">
+          Gender: {{ filters.genderPreference }}
+        </span>
+        <span class="filter-chip" *ngIf="filters.city">
+          City: {{ filters.city }}
+        </span>
+        <button class="clear-all-chips" (click)="resetFilters()">✕ Clear All</button>
+      </div>
+
+      <!-- Skeleton Loaders -->
+      <div class="explore-grid" *ngIf="isLoading()">
+        <div class="listing-skeleton glass-card" *ngFor="let item of [1, 2, 3, 4]">
+          <div class="skeleton img-skeleton"></div>
+          <div class="skeleton title-skeleton"></div>
+          <div class="skeleton text-skeleton"></div>
+        </div>
+      </div>
+
+      <!-- Empty State -->
+      <div class="empty-state glass-card" *ngIf="!isLoading() && listings().length === 0">
+        <span class="empty-icon">🔍</span>
+        <h3>No rentals match your filters</h3>
+        <p>Try broadening your rent range, choosing all property types, or clearing location restrictions.</p>
+        <button (click)="resetFilters()" class="btn btn-primary">Reset Filters</button>
+      </div>
+
+      <!-- Listings Grid / List -->
+      <div class="explore-grid" *ngIf="!isLoading() && listings().length > 0">
+        <div 
+          class="listing-card glass-card" 
+          *ngFor="let list of listings()"
+          [class.hover-active]="hoveredListingId() === list._id"
+          (mouseenter)="setHoveredListing(list._id || null)"
+          (mouseleave)="setHoveredListing(null)"
+        >
+          <div class="image-wrapper zoom-wrapper" [routerLink]="['/explore/details', list._id]">
+            <img [src]="list.images && list.images[0] ? list.images[0] : 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=800&q=80'" alt="{{ list.title }}" class="property-img" />
+            <span class="badge property-type">{{ list.propertyType }}</span>
+            <button class="fav-btn" [class.favorited]="isFavorite(list._id || '')" (click)="toggleFavorite($event, list._id || '')" aria-label="Add to Favorites">
+              ♥
+            </button>
+          </div>
+          <div class="card-body">
+            <div class="distance-badge" *ngIf="list.distance !== null && list.distance !== undefined">
+              📍 {{ list.distance }} km away
+            </div>
+            <h3 class="card-title" [routerLink]="['/explore/details', list._id]">{{ list.title }}</h3>
+            <p class="locality">📍 {{ list.locality }}, {{ list.city }}</p>
+            <div class="meta-row">
+              <span class="furnishing-status text-capitalize">{{ list.furnishing }}</span>
+              <span class="gender-preference text-capitalize" [class]="list.genderPreference">{{ list.genderPreference }} preferred</span>
+            </div>
+            <div class="footer-price-row">
+              <div class="price-container">
+                <span class="rent">₹{{ list.rent | number }}/mo</span>
+                <span class="deposit">Deposit: ₹{{ list.deposit | number }}</span>
+              </div>
+              <a [routerLink]="['/explore/details', list._id]" class="btn-arrow" aria-label="View details">➔</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Map Column -->
+    <section class="map-column-section glass-card">
+      <div id="explore-map" class="map-frame"></div>
+      <div class="map-overlay-badge">
+        Interactive Map view
+      </div>
+    </section>
+  </div>
+</div>

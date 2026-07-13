@@ -1,0 +1,118 @@
+<div class="dashboard-page fade-upward">
+  <!-- Top Welcome workspace header -->
+  <header class="dashboard-header glass-card">
+    <div class="header-info">
+      <div class="breadcrumb">Owner Workspace</div>
+      <h1>Welcome Back, {{ authService.currentUser()?.name }}</h1>
+      <p>Manage your rental properties, update availability states, and add new listings.</p>
+    </div>
+    
+    <a routerLink="/create-listing" class="btn btn-primary add-listing-btn">
+      ➕ List a New Property
+    </a>
+  </header>
+
+  <!-- Dashboard Stats row -->
+  <section class="stats-row">
+    <div class="stat-card glass-card">
+      <span class="stat-icon">🏢</span>
+      <div class="stat-details">
+        <span class="val">{{ totalStays() }}</span>
+        <span class="label">Total Stays</span>
+      </div>
+    </div>
+    
+    <div class="stat-card glass-card success">
+      <span class="stat-icon">✅</span>
+      <div class="stat-details">
+        <span class="val">{{ availableStays() }}</span>
+        <span class="label">Publicly Listed</span>
+      </div>
+    </div>
+    
+    <div class="stat-card glass-card warning">
+      <span class="stat-icon">🔒</span>
+      <div class="stat-details">
+        <span class="val">{{ unavailableStays() }}</span>
+        <span class="label">Hidden / Occupied</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Error display -->
+  <div class="alert alert-error" *ngIf="errorMessage()">
+    <span>⚠️ {{ errorMessage() }}</span>
+  </div>
+
+  <!-- Listings List Workspace -->
+  <section class="workspace-section">
+    <div class="section-header">
+      <h2>My Properties ({{ totalStays() }})</h2>
+    </div>
+
+    <!-- Skeletons loading -->
+    <div class="workspace-loader" *ngIf="isLoading()">
+      <div class="skeleton table-skeleton"></div>
+    </div>
+
+    <!-- Empty state -->
+    <div class="empty-workspace glass-card" *ngIf="!isLoading() && listings().length === 0">
+      <span class="empty-icon">🏢</span>
+      <h3>You haven't listed any properties yet</h3>
+      <p>Publish your PG, flatmate rooms, or family houses to start receiving direct tenant phone calls.</p>
+      <a routerLink="/create-listing" class="btn btn-primary">List Your First Stay</a>
+    </div>
+
+    <!-- Listings Grid / List for Owner Workspace -->
+    <div class="listings-table-container glass-card" *ngIf="!isLoading() && listings().length > 0">
+      <table class="dashboard-table">
+        <thead>
+          <tr>
+            <th>Property Description</th>
+            <th>Type</th>
+            <th>Monthly Rent</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of listings()">
+            <td>
+              <div class="property-detail-cell">
+                <img [src]="item.images && item.images[0] ? item.images[0] : 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=400&q=80'" alt="" class="prop-thumb" />
+                <div class="info">
+                  <a [routerLink]="['/explore/details', item._id]" class="title">{{ item.title }}</a>
+                  <span class="locality">📍 {{ item.locality }}, {{ item.city }}</span>
+                </div>
+              </div>
+            </td>
+            <td>
+              <span class="type-badge">{{ item.propertyType }}</span>
+            </td>
+            <td>
+              <span class="rent">₹{{ item.rent | number }}/mo</span>
+            </td>
+            <td>
+              <!-- Interactive Status Toggle Switch -->
+              <button 
+                (click)="toggleStatus(item)" 
+                class="status-toggle-btn"
+                [class.available]="item.status === 'available'"
+                title="Toggle listing visibility"
+              >
+                {{ item.status === 'available' ? '🟢 Public' : '🔴 Hidden' }}
+              </button>
+            </td>
+            <td>
+              <div class="actions-group">
+                <a [routerLink]="['/explore/details', item._id]" class="action-link" title="Preview details">👁️ View</a>
+                <a [routerLink]="['/edit-listing', item._id]" class="action-link edit" title="Edit property">✏️ Edit</a>
+                <button (click)="deleteProperty(item._id || '')" class="action-btn delete" title="Delete listing">🗑️ Delete</button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</div>

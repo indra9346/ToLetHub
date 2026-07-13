@@ -1,0 +1,498 @@
+.app-navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 72px;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  transition: background-color 0.4s cubic-bezier(0.25, 1, 0.5, 1),
+              box-shadow 0.4s cubic-bezier(0.25, 1, 0.5, 1),
+              border-color 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+  
+  // Default Style: light page navbar
+  background-color: rgba(255, 255, 255, 0.9);
+  border-bottom: 1px solid rgba(15, 23, 42, 0.05);
+  box-shadow: 0 4px 30px rgba(15, 23, 42, 0.02);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  
+  // Active pill underlines
+  .nav-link.active {
+    color: var(--primary-hover);
+    font-weight: 700;
+    &::after {
+      width: 100%;
+    }
+  }
+
+  // Brand naming color based on state
+  .brand-text {
+    .tolet { color: var(--text-dark); transition: var(--transition-smooth); }
+    .hub { color: var(--primary-hover); }
+  }
+
+  // Home Hero Transparent Navbar Override
+  &.transparent-home {
+    background-color: transparent;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    box-shadow: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    
+    .nav-link {
+      color: rgba(255, 255, 255, 0.8);
+      &:hover { color: white; }
+    }
+    
+    .brand-text .tolet {
+      color: white;
+    }
+    
+    .profile-trigger {
+      color: white;
+      background: rgba(255, 255, 255, 0.06);
+      border-color: rgba(255, 255, 255, 0.1);
+      
+      &:hover {
+        background: rgba(255, 255, 255, 0.12);
+      }
+    }
+
+    .mobile-nav-trigger .bar {
+      background-color: white;
+    }
+  }
+
+  // Scrolled over home hero page
+  &.scrolled {
+    background-color: rgba(6, 10, 19, 0.85); /* Midnight background overlay */
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+
+    .nav-link {
+      color: rgba(255, 255, 255, 0.8);
+      &:hover { color: white; }
+    }
+    
+    .brand-text .tolet {
+      color: white;
+    }
+
+    .profile-trigger {
+      color: white;
+      background: rgba(255, 255, 255, 0.06);
+      border-color: rgba(255, 255, 255, 0.1);
+      
+      &:hover {
+        background: rgba(255, 255, 255, 0.12);
+      }
+    }
+
+    .mobile-nav-trigger .bar {
+      background-color: white;
+    }
+  }
+}
+
+.navbar-container {
+  max-width: 1280px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+// Logo Mark Hover Translation and Soft Glow
+.navbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  
+  .logo-img {
+    width: 36px;
+    height: 36px;
+    object-fit: contain;
+    transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1),
+                filter 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+  }
+
+  &:hover {
+    .logo-img {
+      transform: translateY(-2px) scale(1.05);
+      filter: drop-shadow(0 0 8px rgba(245, 158, 11, 0.6));
+    }
+  }
+
+  .brand-text {
+    font-family: var(--font-display);
+    font-size: 1.35rem;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+  }
+}
+
+.nav-links {
+  display: flex;
+  list-style: none;
+  gap: 32px;
+  margin: 0;
+  padding: 0;
+
+  @media (max-width: 768px) {
+    display: none;
+  }
+}
+
+.nav-link {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--text-dark);
+  padding: 8px 0;
+  position: relative;
+  
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background-color: var(--primary);
+    transition: width 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+  }
+
+  &:hover::after {
+    width: 100%;
+  }
+}
+
+.navbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+
+  @media (max-width: 768px) {
+    display: none;
+  }
+}
+
+/* Profile Dropdown styling */
+.profile-dropdown-wrapper {
+  position: relative;
+}
+
+.profile-trigger {
+  background: rgba(15, 23, 42, 0.03);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  color: var(--text-dark);
+  padding: 6px 14px;
+  border-radius: 30px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: var(--transition-fast);
+  
+  &:hover {
+    background: rgba(15, 23, 42, 0.06);
+  }
+
+  .avatar-letter {
+    width: 26px;
+    height: 26px;
+    background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.8rem;
+  }
+
+  .chevron-arrow {
+    font-size: 0.6rem;
+    transition: transform 0.25s ease;
+    opacity: 0.7;
+    
+    &.open {
+      transform: rotate(180deg);
+    }
+  }
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  width: 250px;
+  background-color: rgba(255, 255, 255, 0.95) !important;
+  border: 1px solid rgba(15, 23, 42, 0.08) !important;
+  border-radius: var(--border-radius-md);
+  padding: 16px !important;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1) !important;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  animation: dropdownEnter 0.25s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+  
+  .dropdown-header {
+    display: flex;
+    flex-direction: column;
+    padding: 4px 8px 10px 8px;
+    
+    .display-name {
+      font-weight: 700;
+      color: var(--text-dark);
+      font-size: 0.95rem;
+    }
+    
+    .role-indicator {
+      font-family: var(--font-display);
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--primary-hover);
+      margin-top: 2px;
+      
+      &.seeker {
+        color: var(--accent-blue);
+      }
+    }
+  }
+
+  .divider {
+    border: 0;
+    height: 1px;
+    background-color: rgba(0, 0, 0, 0.06);
+    margin: 6px 0;
+  }
+
+  .dropdown-item {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--text-dark);
+    padding: 10px 12px;
+    border-radius: var(--border-radius-sm);
+    display: flex;
+    align-items: center;
+    width: 100%;
+    text-align: left;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    transition: var(--transition-fast);
+    
+    &:hover {
+      background-color: rgba(245, 158, 11, 0.08);
+      color: var(--primary-hover);
+      transform: translateX(2px);
+    }
+    
+    &.logout-btn {
+      color: var(--accent);
+      
+      &:hover {
+        background-color: rgba(244, 63, 94, 0.08);
+        color: #e11d48;
+      }
+    }
+  }
+}
+
+@keyframes dropdownEnter {
+  0% {
+    opacity: 0;
+    transform: translateY(8px) scale(0.96);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Mobile Nav Hamburger styling */
+.mobile-nav-trigger {
+  display: none;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  flex-direction: column;
+  gap: 5px;
+  width: 30px;
+  height: 30px;
+  justify-content: center;
+  z-index: 1100;
+  
+  .bar {
+    display: block;
+    width: 22px;
+    height: 2px;
+    background-color: var(--text-dark);
+    border-radius: 2px;
+    transition: var(--transition-smooth);
+  }
+
+  &.active {
+    .bar-1 {
+      transform: rotate(45deg) translate(5px, 5px);
+    }
+    .bar-2 {
+      opacity: 0;
+    }
+    .bar-3 {
+      transform: rotate(-45deg) translate(5px, -5px);
+    }
+  }
+
+  @media (max-width: 768px) {
+    display: flex;
+  }
+}
+
+/* Mobile Drawer styles */
+.mobile-drawer-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(6, 10, 19, 0.6);
+  backdrop-filter: blur(4px);
+  z-index: 1050;
+}
+
+.mobile-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 300px;
+  height: 100vh;
+  background-color: #0c1220; /* Dark Charcoal drawer background */
+  z-index: 1060;
+  padding: 30px 24px;
+  display: flex;
+  flex-direction: column;
+  transform: translateX(100%);
+  transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+  box-shadow: -10px 0 40px rgba(0, 0, 0, 0.3);
+  
+  &.open {
+    transform: translateX(0);
+  }
+
+  .drawer-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 30px;
+    
+    .logo-img {
+      width: 32px;
+      height: 32px;
+    }
+    .tolet { color: white; }
+    
+    .btn-close-drawer {
+      background: transparent;
+      border: none;
+      color: #9ca3af;
+      font-size: 1.25rem;
+      cursor: pointer;
+      padding: 8px;
+      &:hover { color: white; }
+    }
+  }
+
+  .drawer-user-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: var(--border-radius-sm);
+    margin-bottom: 24px;
+
+    .avatar-big {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+      color: white;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .details {
+      display: flex;
+      flex-direction: column;
+      
+      .name {
+        color: white;
+        font-weight: 700;
+        font-size: 0.9rem;
+      }
+      
+      .role {
+        font-size: 0.75rem;
+        color: var(--primary);
+        font-weight: 600;
+        
+        &.seeker {
+          color: var(--accent-blue);
+        }
+      }
+    }
+  }
+
+  .drawer-links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .drawer-link {
+    display: block;
+    color: #9ca3af;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1.05rem;
+    padding: 8px 0;
+    
+    &.active {
+      color: var(--primary);
+      transform: translateX(4px);
+    }
+    
+    &:hover {
+      color: white;
+      transform: translateX(4px);
+    }
+  }
+
+  .drawer-footer {
+    margin-top: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    
+    .btn-block {
+      width: 100%;
+    }
+  }
+}

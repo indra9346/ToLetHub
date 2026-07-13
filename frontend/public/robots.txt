@@ -1,0 +1,9 @@
+# ToLetHub Robots.txt
+User-agent: *
+Allow: /
+Disallow: /dashboard
+Disallow: /create-listing
+Disallow: /edit-listing/
+Disallow: /profile
+
+Sitemap: https://tolethub.example.com/sitemap.xml

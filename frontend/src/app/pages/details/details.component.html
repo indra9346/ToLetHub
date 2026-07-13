@@ -1,0 +1,228 @@
+<div class="details-page fade-upward">
+  <!-- Loading state -->
+  <div class="loader-container" *ngIf="isLoading()">
+    <div class="skeleton details-skeleton"></div>
+  </div>
+
+  <div class="details-container" *ngIf="!isLoading() && listing() as stay">
+    
+    <!-- Top Details Header -->
+    <header class="details-header glass-card">
+      <div class="title-meta">
+        <div class="breadcrumb">
+          <a routerLink="/explore">Explore</a> ➔ <span class="active">{{ stay.propertyType }} in {{ stay.locality }}</span>
+        </div>
+        <h1>{{ stay.title }}</h1>
+        <p class="address">📍 {{ stay.address }}, {{ stay.city }}</p>
+        
+        <!-- Distance Proximity Banner -->
+        <div class="distance-info" *ngIf="computedDistance() !== null">
+          <span>🚀 Located **{{ computedDistance() }} km** away from your position.</span>
+        </div>
+      </div>
+
+      <div class="price-actions">
+        <div class="price-tag">
+          <span class="rent">₹{{ stay.rent | number }}/mo</span>
+          <span class="deposit">Deposit: ₹{{ stay.deposit | number }}</span>
+        </div>
+        <button class="btn btn-secondary fav-toggle-btn" [class.favorited]="isFavorite()" (click)="toggleFavorite()">
+          {{ isFavorite() ? '❤️ Saved' : '🤍 Save Stay' }}
+        </button>
+      </div>
+    </header>
+
+    <div class="details-grid">
+      
+      <!-- Left Column: Media Gallery + Description + Specifications -->
+      <div class="main-column">
+        
+        <!-- Photo Slider -->
+        <section class="photo-slider glass-card">
+          <div class="main-image-wrapper zoom-wrapper" (click)="togglePreviewModal(true)">
+            <img 
+              [src]="stay.images?.[activeImageIndex()] || 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=1200&q=80'" 
+              alt="{{ stay.title }}" 
+              class="active-image" 
+            />
+            
+            <button class="slider-btn prev-btn" (click)="$event.stopPropagation(); prevImage()" *ngIf="(stay.images?.length || 0) > 1">◀</button>
+            <button class="slider-btn next-btn" (click)="$event.stopPropagation(); nextImage()" *ngIf="(stay.images?.length || 0) > 1">▶</button>
+            
+            <!-- Image Counter -->
+            <span class="image-counter">
+              📷 Image {{ activeImageIndex() + 1 }} of {{ stay.images?.length || 1 }}
+            </span>
+          </div>
+          
+          <!-- Thumbnails Row -->
+          <div class="thumbnails-row" *ngIf="(stay.images?.length || 0) > 1">
+            <img 
+              *ngFor="let img of stay.images; let i = index" 
+              [src]="img" 
+              [class.active]="i === activeImageIndex()" 
+              (click)="setHeroImage(i)" 
+              alt="Thumbnail {{ i + 1 }}" 
+              class="thumb"
+            />
+          </div>
+        </section>
+
+        <!-- About section -->
+        <section class="description-section glass-card">
+          <h2>About this stay</h2>
+          <p class="description-text">{{ stay.description }}</p>
+
+          <div class="video-tour-box" *ngIf="stay.videoUrl">
+            <h3>🎥 Virtual walkthrough</h3>
+            <p>A video tour is provided by the landlord. Click below to inspect:</p>
+            <a [href]="stay.videoUrl" target="_blank" class="btn btn-secondary btn-sm">
+              Open Tour Video
+            </a>
+          </div>
+        </section>
+
+        <!-- Specifications Grid -->
+        <section class="specs-section glass-card">
+          <h2>Property Specifications</h2>
+          <div class="specs-grid">
+            <div class="spec-item">
+              <span class="label">Property Type</span>
+              <span class="val text-capitalize">{{ stay.propertyType }}</span>
+            </div>
+            <div class="spec-item">
+              <span class="label">Furnishing Status</span>
+              <span class="val text-capitalize">{{ stay.furnishing }}</span>
+            </div>
+            <div class="spec-item">
+              <span class="label">Gender Preference</span>
+              <span class="val text-capitalize">{{ stay.genderPreference }} preferred</span>
+            </div>
+            <div class="spec-item">
+              <span class="label">Room Sharing</span>
+              <span class="val text-capitalize">{{ stay.roomSharingType }}</span>
+            </div>
+            <div class="spec-item">
+              <span class="label">Food Availability</span>
+              <span class="val">{{ stay.foodAvailability ? 'Provided (Included)' : 'Not Included' }}</span>
+            </div>
+            <div class="spec-item">
+              <span class="label">Available From</span>
+              <span class="val">{{ stay.availableFrom | date:'mediumDate' }}</span>
+            </div>
+            <div class="spec-item">
+              <span class="label">Occupancy Status</span>
+              <span class="val status-badge" [class.available]="stay.status === 'available'">
+                {{ stay.status === 'available' ? 'Available' : 'Occupied' }}
+              </span>
+            </div>
+          </div>
+        </section>
+
+        <!-- Staggered Amenities List -->
+        <section class="amenities-section glass-card">
+          <h2>Amenities Provided</h2>
+          <div class="amenities-grid">
+            <div class="amenity-card animate-amenity" *ngFor="let am of stay.amenities">
+              <span class="check-icon">✓</span> {{ am }}
+            </div>
+            <div class="empty-amenities" *ngIf="!stay.amenities || stay.amenities.length === 0">
+              No amenities declared.
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- Right Column: Sticky Contact Card + Interactive Maps -->
+      <aside class="sidebar-column">
+        <!-- Landlord Contact Card -->
+        <div class="contact-card glass-card">
+          <h3>Contact Landlord</h3>
+          
+          <div class="landlord-profile">
+            <span class="avatar">👤</span>
+            <div class="info">
+              <span class="name">{{ stay.contactName }}</span>
+              <span class="title">Property Landlord</span>
+            </div>
+          </div>
+
+          <div class="contact-details-row">
+            <div class="detail-item">
+              <span class="label">Phone Number</span>
+              <a href="tel:{{ stay.contactPhone }}" class="val phone-link">{{ stay.contactPhone }}</a>
+            </div>
+            <div class="detail-item" *ngIf="stay.owner">
+              <span class="label">Email Address</span>
+              <span class="val email">{{ getOwnerEmail() }}</span>
+            </div>
+          </div>
+
+          <div class="disclaimer-note">
+            <span>🛡️ **Safety Note**: Never transfer security deposits or advance payments online without visiting the property and meeting the owner in person.</span>
+          </div>
+        </div>
+
+        <!-- Interactive Map frame -->
+        <div class="map-card glass-card">
+          <h3>Location Map</h3>
+          <div id="detail-map" class="map-frame"></div>
+          
+          <!-- Directions trigger button -->
+          <button (click)="getDirections()" class="btn btn-secondary btn-block get-directions-btn">
+            🗺️ Open Google Maps directions
+          </button>
+          <span class="map-caption">Opens navigation link in a new browser tab.</span>
+        </div>
+      </aside>
+    </div>
+
+    <!-- Similar Properties Carousel -->
+    <section class="similar-section" *ngIf="similarListings().length > 0">
+      <div class="section-header-row">
+        <h2>Similar Properties Nearby</h2>
+      </div>
+      <div class="similar-grid">
+        <div class="listing-card glass-card" *ngFor="let item of similarListings()" [routerLink]="['/explore/details', item._id]">
+          <div class="image-wrapper zoom-wrapper">
+            <img [src]="item.images && item.images[0] ? item.images[0] : 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=400&q=80'" alt="{{ item.title }}" class="property-img" />
+            <span class="badge property-type">{{ item.propertyType }}</span>
+          </div>
+          <div class="card-body">
+            <h3 class="card-title">{{ item.title }}</h3>
+            <p class="locality">📍 {{ item.locality }}, {{ item.city }}</p>
+            <div class="footer-price-row">
+              <span class="rent">₹{{ item.rent | number }}/mo</span>
+              <span class="btn-arrow">➔</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Mobile Sticky Contact Bar -->
+    <div class="mobile-action-bar">
+      <div class="price-container">
+        <span class="rent">₹{{ stay.rent | number }}/mo</span>
+        <span class="label">Rent + Deposit</span>
+      </div>
+      <a href="tel:{{ stay.contactPhone }}" class="btn btn-primary call-btn">
+        📞 Call Owner
+      </a>
+    </div>
+  </div>
+
+  <!-- Fullscreen Lightbox Image Modal -->
+  <div class="fullscreen-lightbox" *ngIf="showPreviewModal() && listing() as stay">
+    <div class="lightbox-backdrop" (click)="togglePreviewModal(false)"></div>
+    <div class="lightbox-content">
+      <button class="btn-close-lightbox" (click)="togglePreviewModal(false)" aria-label="Close image">✕</button>
+      <img [src]="stay.images?.[activeImageIndex()] || 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=1200&q=80'" alt="" class="lightbox-img" />
+      <div class="lightbox-nav">
+        <button (click)="$event.stopPropagation(); prevImage()" class="btn-lightbox-nav">◀</button>
+        <span class="counter-text">{{ activeImageIndex() + 1 }} / {{ stay.images?.length || 1 }}</span>
+        <button (click)="$event.stopPropagation(); nextImage()" class="btn-lightbox-nav">▶</button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,166 @@
+<div class="favorites-page fade-upward">
+  <header class="page-header">
+    <h1>My Saved Favorites</h1>
+    <p>Compare saved accommodations side-by-side to make your choice.</p>
+  </header>
+
+  <!-- Empty state with custom inline SVG heart-home illustration -->
+  <div class="empty-state-container glass-card" *ngIf="!isLoading() && favoriteService.favoriteListings().length === 0">
+    <svg class="empty-svg" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="2">
+      <!-- House outline -->
+      <path d="M20 80 V45 L50 20 L80 45 V80 H20 Z" stroke="#94a3b8" />
+      <!-- Heart in the middle -->
+      <path d="M50 62 C45 55 35 55 35 48 C35 43 40 38 45 38 C48 38 50 42 50 42 C50 42 52 38 55 38 C60 38 65 43 65 48 C65 55 55 55 50 62 Z" fill="#f43f5e" stroke="#f43f5e" />
+    </svg>
+    <h3>Your wishlist is empty</h3>
+    <p>Explore properties and click the ♥ icon on any stay card to save it here for comparison.</p>
+    <a routerLink="/explore" class="btn btn-primary">Find Stays Now</a>
+  </div>
+
+  <div class="favorites-layout" *ngIf="!isLoading() && favoriteService.favoriteListings().length > 0">
+    <!-- Left Column: Wishlist selection -->
+    <section class="wishlist-column">
+      <div class="column-header">
+        <h2>Saved Properties ({{ favoriteService.favoriteListings().length }})</h2>
+        <span class="count-badge" [class.maxed]="compareList().length >= 3">
+          {{ compareList().length }} / 3 selected to compare
+        </span>
+      </div>
+
+      <div class="favorites-list">
+        <div class="fav-item-card glass-card" *ngFor="let list of favoriteService.favoriteListings()" [class.selected]="isComparing(list._id || '')">
+          <div class="thumb-wrapper">
+            <img [src]="list.images && list.images[0] ? list.images[0] : 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=400&q=80'" alt="{{ list.title }}" class="fav-img" />
+          </div>
+          
+          <div class="fav-info">
+            <h3 [routerLink]="['/explore/details', list._id]">{{ list.title }}</h3>
+            <p class="locality">📍 {{ list.locality }}, {{ list.city }}</p>
+            <span class="rent">₹{{ list.rent | number }}/mo</span>
+            
+            <div class="actions-row">
+              <button (click)="toggleCompare(list)" class="btn btn-secondary btn-sm select-btn">
+                {{ isComparing(list._id || '') ? '✓ Selected' : '+ Compare' }}
+              </button>
+              <button (click)="removeFavorite($event, list._id || '')" class="btn-remove" title="Remove from Favorites">✕ Remove</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Right Column: Comparison Matrix Grid -->
+    <section class="compare-column">
+      <div class="column-header">
+        <h2>Comparison Matrix</h2>
+        <button (click)="clearCompare()" class="btn btn-secondary btn-sm btn-clear-matrix" *ngIf="compareList().length > 0">
+          Clear Table
+        </button>
+      </div>
+
+      <!-- Compare Grid Placeholder if empty -->
+      <div class="compare-placeholder glass-card" *ngIf="compareList().length === 0">
+        <span class="icon">⚖️</span>
+        <h3>No stays selected</h3>
+        <p>Click the **"+ Compare"** button on saved cards to evaluate pricing, proximity, and amenities side-by-side.</p>
+      </div>
+
+      <!-- Comparison Matrix Table -->
+      <div class="matrix-container glass-card" *ngIf="compareList().length > 0">
+        <table class="compare-table">
+          <thead>
+            <tr>
+              <th class="feature-header sticky-col">Features</th>
+              <th *ngFor="let item of compareList()">
+                <div class="header-cell">
+                  <img [src]="item.images[0] || 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=400&q=80'" alt="" class="compare-thumb" />
+                  <span class="title" [routerLink]="['/explore/details', item._id]">{{ item.title }}</span>
+                </div>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Category -->
+            <tr>
+              <td class="feature-label sticky-col">Type</td>
+              <td *ngFor="let item of compareList()" class="val">{{ item.propertyType }}</td>
+            </tr>
+
+            <!-- Rent -->
+            <tr>
+              <td class="feature-label sticky-col">Monthly Rent</td>
+              <td *ngFor="let item of compareList()" class="val highlighted" [class.best-value]="getLowestRentId() === item._id">
+                ₹{{ item.rent | number }}/mo
+                <span class="best-badge" *ngIf="getLowestRentId() === item._id">⚡ Best Rent</span>
+              </td>
+            </tr>
+
+            <!-- Deposit -->
+            <tr>
+              <td class="feature-label sticky-col">Deposit</td>
+              <td *ngFor="let item of compareList()" class="val">₹{{ item.deposit | number }}</td>
+            </tr>
+
+            <!-- Locality -->
+            <tr>
+              <td class="feature-label sticky-col">Locality</td>
+              <td *ngFor="let item of compareList()" class="val">📍 {{ item.locality }}</td>
+            </tr>
+
+            <!-- Furnishing -->
+            <tr>
+              <td class="feature-label sticky-col">Furnishing</td>
+              <td *ngFor="let item of compareList()" class="val text-capitalize">{{ item.furnishing }}</td>
+            </tr>
+
+            <!-- Gender Preference -->
+            <tr>
+              <td class="feature-label sticky-col">Preference</td>
+              <td *ngFor="let item of compareList()" class="val text-capitalize">{{ item.genderPreference }} preferred</td>
+            </tr>
+
+            <!-- Food Availability -->
+            <tr>
+              <td class="feature-label sticky-col">Food Included</td>
+              <td *ngFor="let item of compareList()" class="val">
+                {{ item.foodAvailability ? '✅ Included' : '❌ No food' }}
+              </td>
+            </tr>
+
+            <!-- Distance -->
+            <tr>
+              <td class="feature-label sticky-col">Distance</td>
+              <td *ngFor="let item of compareList()" class="val" [class.best-value]="getNearestDistanceId() === item._id">
+                <span *ngIf="item.distance !== undefined && item.distance !== null">🚀 {{ item.distance }} km</span>
+                <span *ngIf="item.distance === undefined || item.distance === null" class="text-muted">N/A</span>
+                <span class="best-badge" *ngIf="getNearestDistanceId() === item._id">🚀 Closest</span>
+              </td>
+            </tr>
+
+            <!-- Amenities -->
+            <tr>
+              <td class="feature-label sticky-col">Amenities</td>
+              <td *ngFor="let item of compareList()" class="val scroll-amenities">
+                <div class="matrix-amenities">
+                  <span *ngFor="let am of item.amenities" class="am-badge">✓ {{ am }}</span>
+                  <span *ngIf="!item.amenities || item.amenities.length === 0" class="text-muted">None listed</span>
+                </div>
+              </td>
+            </tr>
+
+            <!-- Action button -->
+            <tr>
+              <td class="feature-label sticky-col"></td>
+              <td *ngFor="let item of compareList()">
+                <div class="action-cell">
+                  <a [routerLink]="['/explore/details', item._id]" class="btn btn-primary btn-sm">View details</a>
+                  <button (click)="toggleCompare(item)" class="btn-close-matrix">Remove</button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+</div>

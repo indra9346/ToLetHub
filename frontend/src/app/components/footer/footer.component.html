@@ -1,0 +1,49 @@
+<footer class="footer">
+  <div class="footer-container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a routerLink="/" class="logo-container">
+          <span class="logo-icon">🏠</span>
+          <span class="logo-text">ToLet<span class="logo-highlight">Hub</span></span>
+        </a>
+        <p class="brand-desc">
+          Simplifying property searching for Indian rental seekers. Find comfortable PGs, rooms, and houses near you without the hassle of door-to-door searching.
+        </p>
+      </div>
+
+      <div class="footer-links-col">
+        <h3>Platform</h3>
+        <ul>
+          <li><a routerLink="/">Home</a></li>
+          <li><a routerLink="/explore">Explore Listings</a></li>
+          <li><a routerLink="/login">Login / Register</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-links-col">
+        <h3>Categories</h3>
+        <ul>
+          <li><a routerLink="/explore" [queryParams]="{propertyType: 'PG'}">Paying Guests (PG)</a></li>
+          <li><a routerLink="/explore" [queryParams]="{propertyType: 'Room'}">Rental Rooms</a></li>
+          <li><a routerLink="/explore" [queryParams]="{propertyType: 'House'}">Independent Houses</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-links-col">
+        <h3>Support & Info</h3>
+        <p class="support-info">
+          📍 Koramangala Outer Ring Rd, Bangalore, India<br>
+          📞 +91 80 4321 8765<br>
+          ✉️ support&#64;tolethub.com
+        </p>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <p>&copy; {{ currentYear }} ToLetHub. Built as a production-quality internship assignment.</p>
+      <div class="footer-meta-links">
+        <span class="meta-note">AI Assistant Enabled</span>
+      </div>
+    </div>
+  </div>
+</footer>

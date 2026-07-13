@@ -1,0 +1,12 @@
+@import '../create-listing/create-listing.component.scss';
+
+.loader-placeholder {
+  display: flex;
+  justify-content: center;
+  padding: 40px 0;
+  
+  .form-skeleton {
+    width: 100%;
+    height: 400px;
+  }
+}

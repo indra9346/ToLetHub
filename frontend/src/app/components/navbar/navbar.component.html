@@ -1,0 +1,137 @@
+<nav class="app-navbar" [class.transparent-home]="isHomePage() && !isScrolled()" [class.scrolled]="isScrolled()">
+  <div class="navbar-container">
+    
+    <!-- Branding logo + name -->
+    <a routerLink="/" class="navbar-brand" aria-label="ToLetHub Home">
+      <img src="assets/branding/tolethub-logo-mark.png" alt="" class="logo-img" />
+      <span class="brand-text">
+        <span class="tolet">ToLet</span><span class="hub">Hub</span>
+      </span>
+    </a>
+
+    <!-- Desktop Navigation Links -->
+    <ul class="nav-links">
+      <li>
+        <a routerLink="/explore" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" class="nav-link">
+          Explore Stays
+        </a>
+      </li>
+      <li>
+        <a routerLink="/favorites" routerLinkActive="active" class="nav-link">
+          Favorites Wishlist
+        </a>
+      </li>
+      <li *ngIf="authService.isOwner()">
+        <a routerLink="/dashboard" routerLinkActive="active" class="nav-link">
+          Owner Workspace
+        </a>
+      </li>
+    </ul>
+
+    <!-- Desktop Auth States / Profile Actions -->
+    <div class="navbar-actions">
+      <!-- Authenticated User Profile Dropdown -->
+      <div class="profile-dropdown-wrapper" *ngIf="authService.currentUser() as user">
+        <button class="profile-trigger" (click)="toggleProfileDropdown($event)" aria-haspopup="menu" [attr.aria-expanded]="isProfileDropdownOpen()" aria-label="User menu">
+          <span class="avatar-letter">{{ user.name.charAt(0).toUpperCase() }}</span>
+          <span class="user-name">{{ user.name }}</span>
+          <span class="chevron-arrow" [class.open]="isProfileDropdownOpen()">▼</span>
+        </button>
+
+        <!-- Dropdown Menu -->
+        <div class="dropdown-menu glass-card" *ngIf="isProfileDropdownOpen()" role="menu">
+          <div class="dropdown-header">
+            <span class="display-name">{{ user.name }}</span>
+            <span class="role-indicator" [class]="user.role">
+              {{ user.role === 'owner' ? '🔑 Landlord' : '🏠 Seeker' }}
+            </span>
+          </div>
+          <hr class="divider" />
+          <a routerLink="/profile" class="dropdown-item" role="menuitem">👤 Profile Summary</a>
+          <a *ngIf="user.role === 'owner'" routerLink="/dashboard" class="dropdown-item" role="menuitem">🏢 Properties Dashboard</a>
+          <a *ngIf="user.role === 'owner'" routerLink="/create-listing" class="dropdown-item" role="menuitem">➕ Add New Property</a>
+          <a routerLink="/favorites" class="dropdown-item" role="menuitem">❤️ Saved Wishlist</a>
+          <hr class="divider" />
+          <button (click)="logout()" class="dropdown-item logout-btn" role="menuitem">🚪 Sign Out</button>
+        </div>
+      </div>
+
+      <!-- Unauthenticated State -->
+      <a routerLink="/login" class="btn btn-primary btn-sm login-nav-btn" *ngIf="!authService.isAuthenticated()">
+        Sign In / Register
+      </a>
+    </div>
+
+    <!-- Mobile Hamburger Trigger Button -->
+    <button class="mobile-nav-trigger" (click)="toggleMobileMenu()" [class.active]="isMobileMenuOpen()" aria-label="Toggle Navigation Drawer" aria-controls="mobile-drawer" [attr.aria-expanded]="isMobileMenuOpen()">
+      <span class="bar bar-1"></span>
+      <span class="bar bar-2"></span>
+      <span class="bar bar-3"></span>
+    </button>
+  </div>
+</nav>
+
+<!-- Mobile Navigation Drawer Overlay + Slide-in Panel -->
+<div class="mobile-drawer-overlay" *ngIf="isMobileMenuOpen()" (click)="isMobileMenuOpen.set(false)" aria-hidden="true"></div>
+
+<div class="mobile-drawer" id="mobile-drawer" [class.open]="isMobileMenuOpen()">
+  <div class="drawer-header">
+    <a routerLink="/" class="navbar-brand" (click)="isMobileMenuOpen.set(false)">
+      <img src="assets/branding/tolethub-logo-mark.png" alt="" class="logo-img" />
+      <span class="brand-text">
+        <span class="tolet">ToLet</span><span class="hub">Hub</span>
+      </span>
+    </a>
+    <button class="btn-close-drawer" (click)="isMobileMenuOpen.set(false)" aria-label="Close menu">✕</button>
+  </div>
+
+  <!-- User info card inside drawer if logged in -->
+  <div class="drawer-user-info" *ngIf="authService.currentUser() as user">
+    <div class="avatar-big">{{ user.name.charAt(0).toUpperCase() }}</div>
+    <div class="details">
+      <span class="name">{{ user.name }}</span>
+      <span class="role" [class]="user.role">
+        {{ user.role === 'owner' ? 'Property Landlord' : 'Rental Seeker' }}
+      </span>
+    </div>
+  </div>
+
+  <!-- Links List -->
+  <ul class="drawer-links">
+    <li>
+      <a routerLink="/explore" (click)="isMobileMenuOpen.set(false)" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" class="drawer-link">
+        🗺️ Explore Stays
+      </a>
+    </li>
+    <li>
+      <a routerLink="/favorites" (click)="isMobileMenuOpen.set(false)" routerLinkActive="active" class="drawer-link">
+        ❤️ Saved Wishlist
+      </a>
+    </li>
+    <li *ngIf="authService.isOwner()">
+      <a routerLink="/dashboard" (click)="isMobileMenuOpen.set(false)" routerLinkActive="active" class="drawer-link">
+        🏢 Owner Workspace
+      </a>
+    </li>
+    <li *ngIf="authService.isOwner()">
+      <a routerLink="/create-listing" (click)="isMobileMenuOpen.set(false)" routerLinkActive="active" class="drawer-link">
+        ➕ Add New Property
+      </a>
+    </li>
+    <li>
+      <a routerLink="/profile" (click)="isMobileMenuOpen.set(false)" routerLinkActive="active" class="drawer-link">
+        👤 My Profile Details
+      </a>
+    </li>
+  </ul>
+
+  <!-- CTA Action Drawer Bottom -->
+  <div class="drawer-footer">
+    <button (click)="logout()" class="btn btn-accent btn-block" *ngIf="authService.isAuthenticated()">
+      🚪 Log Out
+    </button>
+    <a routerLink="/login" (click)="isMobileMenuOpen.set(false)" class="btn btn-primary btn-block" *ngIf="!authService.isAuthenticated()">
+      Sign In / Register
+    </a>
+  </div>
+</div>

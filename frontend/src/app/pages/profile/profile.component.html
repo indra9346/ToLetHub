@@ -1,0 +1,43 @@
+<div class="profile-page">
+  <div class="profile-card glass-card">
+    <div class="profile-header">
+      <div class="avatar-big">👤</div>
+      <h1>{{ authService.currentUser()?.name }}</h1>
+      <span class="role-badge" [class]="authService.currentUser()?.role">
+        {{ authService.currentUser()?.role === 'owner' ? 'Property Owner' : 'Rental Seeker' }}
+      </span>
+    </div>
+
+    <!-- Contact Info Block -->
+    <div class="profile-info-grid">
+      <div class="info-item">
+        <span class="label">Email Address</span>
+        <span class="val">{{ authService.currentUser()?.email }}</span>
+      </div>
+      <div class="info-item">
+        <span class="label">Contact Phone</span>
+        <span class="val">{{ authService.currentUser()?.phone }}</span>
+      </div>
+    </div>
+
+    <!-- Dynamic stats depending on role -->
+    <div class="stats-panel">
+      <div class="stat-widget" *ngIf="authService.isOwner()">
+        <span class="stat-count">{{ totalProperties() }}</span>
+        <span class="stat-label">Active Listings Published</span>
+      </div>
+      
+      <div class="stat-widget" *ngIf="authService.isSeeker()">
+        <span class="stat-count">{{ favoriteService.favoriteListings().length }}</span>
+        <span class="stat-label">Stays Saved in Wishlist</span>
+      </div>
+    </div>
+
+    <!-- Actions block -->
+    <div class="profile-actions">
+      <a *ngIf="authService.isOwner()" routerLink="/dashboard" class="btn btn-primary">Go to Dashboard</a>
+      <a routerLink="/explore" class="btn btn-secondary">Explore Listings</a>
+      <button (click)="logout()" class="btn btn-accent btn-logout">Sign Out</button>
+    </div>
+  </div>
+</div>

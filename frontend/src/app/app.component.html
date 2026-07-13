@@ -1,0 +1,28 @@
+<!-- Cinematic Splash Screen Overlay (Failsafe CSS auto-fades even if JS fails) -->
+<div class="splash-overlay" *ngIf="showSplash()">
+  <div class="splash-content">
+    <div class="logo-wrapper">
+      <img src="assets/branding/tolethub-logo-mark.png" alt="ToLetHub Logo" class="splash-logo" />
+      <!-- Minimal vector path drawing overlay -->
+      <svg class="path-svg" viewBox="0 0 100 100" aria-hidden="true">
+        <path d="M 15 65 L 50 20 L 85 65" class="draw-path" fill="none" stroke="#f59e0b" stroke-width="2" />
+      </svg>
+      <div class="light-window"></div>
+    </div>
+    <h1 class="splash-title">
+      <span class="white">ToLet</span><span class="amber">Hub</span>
+    </h1>
+    <p class="splash-tagline">Find a place that feels like home.</p>
+  </div>
+</div>
+
+<!-- Main App Layout (renders behind the splash overlay) -->
+<app-navbar></app-navbar>
+
+<main class="main-content">
+  <router-outlet></router-outlet>
+</main>
+
+<app-footer></app-footer>
+
+<app-chatbot></app-chatbot>

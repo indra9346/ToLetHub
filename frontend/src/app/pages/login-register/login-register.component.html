@@ -1,0 +1,159 @@
+<div class="auth-page">
+  <div class="auth-container glass-card">
+    <div class="auth-tabs">
+      <button class="tab-btn" [class.active]="isLoginMode()" (click)="isLoginMode.set(true)">Login</button>
+      <button class="tab-btn" [class.active]="!isLoginMode()" (click)="isLoginMode.set(false)">Register</button>
+    </div>
+
+    <!-- Feedback Banners -->
+    <div class="alert alert-error" *ngIf="errorMessage()">
+      <span>⚠️ {{ errorMessage() }}</span>
+    </div>
+    <div class="alert alert-success" *ngIf="successMessage()">
+      <span>✅ {{ successMessage() }}</span>
+    </div>
+
+    <!-- Login Form -->
+    <form [formGroup]="loginForm" (ngSubmit)="onLogin()" *ngIf="isLoginMode()" class="auth-form">
+      <div class="form-group">
+        <label for="login-email">Email Address</label>
+        <input 
+          id="login-email" 
+          type="email" 
+          formControlName="email" 
+          class="form-control" 
+          placeholder="e.g. seeker@tolethub.com"
+        />
+        <span class="error-msg" *ngIf="loginForm.get('email')?.touched && loginForm.get('email')?.errors?.['required']">
+          Email is required.
+        </span>
+        <span class="error-msg" *ngIf="loginForm.get('email')?.touched && loginForm.get('email')?.errors?.['email']">
+          Please enter a valid email format.
+        </span>
+      </div>
+
+      <div class="form-group">
+        <label for="login-password">Password</label>
+        <input 
+          id="login-password" 
+          type="password" 
+          formControlName="password" 
+          class="form-control" 
+          placeholder="••••••••"
+        />
+        <span class="error-msg" *ngIf="loginForm.get('password')?.touched && loginForm.get('password')?.errors?.['required']">
+          Password is required.
+        </span>
+        <span class="error-msg" *ngIf="loginForm.get('password')?.touched && loginForm.get('password')?.errors?.['minlength']">
+          Password must be at least 6 characters.
+        </span>
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-block" [disabled]="isLoading()">
+        <span *ngIf="!isLoading()">Sign In</span>
+        <span *ngIf="isLoading()" class="loader">Signing In...</span>
+      </button>
+
+      <p class="auth-switch">
+        New to ToLetHub? <a (click)="toggleMode()">Create an account</a>
+      </p>
+    </form>
+
+    <!-- Register Form -->
+    <form [formGroup]="registerForm" (ngSubmit)="onRegister()" *ngIf="!isLoginMode()" class="auth-form">
+      <div class="form-group">
+        <label for="reg-name">Full Name</label>
+        <input 
+          id="reg-name" 
+          type="text" 
+          formControlName="name" 
+          class="form-control" 
+          placeholder="e.g. Amit Sharma"
+        />
+        <span class="error-msg" *ngIf="registerForm.get('name')?.touched && registerForm.get('name')?.errors?.['required']">
+          Full Name is required.
+        </span>
+      </div>
+
+      <div class="form-group">
+        <label for="reg-email">Email Address</label>
+        <input 
+          id="reg-email" 
+          type="email" 
+          formControlName="email" 
+          class="form-control" 
+          placeholder="e.g. seeker@tolethub.com"
+        />
+        <span class="error-msg" *ngIf="registerForm.get('email')?.touched && registerForm.get('email')?.errors?.['required']">
+          Email is required.
+        </span>
+        <span class="error-msg" *ngIf="registerForm.get('email')?.touched && registerForm.get('email')?.errors?.['email']">
+          Please enter a valid email format.
+        </span>
+      </div>
+
+      <div class="form-group">
+        <label for="reg-phone">Contact Phone Number</label>
+        <input 
+          id="reg-phone" 
+          type="tel" 
+          formControlName="phone" 
+          class="form-control" 
+          placeholder="e.g. +91 99999 88888"
+        />
+        <span class="error-msg" *ngIf="registerForm.get('phone')?.touched && registerForm.get('phone')?.errors?.['required']">
+          Phone number is required.
+        </span>
+        <span class="error-msg" *ngIf="registerForm.get('phone')?.touched && registerForm.get('phone')?.errors?.['pattern']">
+          Please enter a valid phone number (10-15 digits).
+        </span>
+      </div>
+
+      <div class="form-group">
+        <label>I want to:</label>
+        <div class="role-selector">
+          <label class="radio-label">
+            <input type="radio" formControlName="role" value="seeker" />
+            <div class="role-card">
+              <span class="icon">🔍</span>
+              <span>Find Property (Seeker)</span>
+            </div>
+          </label>
+          <label class="radio-label">
+            <input type="radio" formControlName="role" value="owner" />
+            <div class="role-card">
+              <span class="icon">🔑</span>
+              <span>List Property (Owner)</span>
+            </div>
+          </label>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="reg-password">Password</label>
+        <input 
+          id="reg-password" 
+          type="password" 
+          formControlName="password" 
+          class="form-control" 
+          placeholder="Min 6 characters"
+        />
+        <span class="error-msg" *ngIf="registerForm.get('password')?.touched && registerForm.get('password')?.errors?.['required']">
+          Password is required.
+        </span>
+        <span class="error-msg" *ngIf="registerForm.get('password')?.touched && registerForm.get('password')?.errors?.['minlength']">
+          Password must be at least 6 characters.
+        </span>
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-block" [disabled]="isLoading()">
+        <span *ngIf="!isLoading()">Create Account</span>
+        <span *ngIf="isLoading()" class="loader">Creating Account...</span>
+      </button>
+
+      <p class="auth-switch">
+        Already have an account? <a (click)="toggleMode()">Sign In</a>
+      </p>
+    </form>
+  </div>
+</div>

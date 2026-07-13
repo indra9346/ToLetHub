@@ -1,0 +1,286 @@
+<div class="create-page fade-upward">
+  <div class="create-container glass-card">
+    <header class="form-header">
+      <h1>Edit Rental Details</h1>
+      <p>Modify stay listing attributes below to save changes.</p>
+    </header>
+
+    <!-- Visual Stepper Progress Bar -->
+    <div class="form-stepper" aria-label="Form Steps Progress">
+      <div class="step-indicator" [class.active]="currentStep() >= 1" [class.current]="currentStep() === 1">
+        <span class="step-number">1</span>
+        <span class="step-label">Basic Info</span>
+      </div>
+      <div class="step-connector" [class.active]="currentStep() >= 2"></div>
+      <div class="step-indicator" [class.active]="currentStep() >= 2" [class.current]="currentStep() === 2">
+        <span class="step-number">2</span>
+        <span class="step-label">Rent & Preference</span>
+      </div>
+      <div class="step-connector" [class.active]="currentStep() >= 3"></div>
+      <div class="step-indicator" [class.active]="currentStep() >= 3" [class.current]="currentStep() === 3">
+        <span class="step-number">3</span>
+        <span class="step-label">Amenities & Media</span>
+      </div>
+      <div class="step-connector" [class.active]="currentStep() >= 4"></div>
+      <div class="step-indicator" [class.active]="currentStep() >= 4" [class.current]="currentStep() === 4">
+        <span class="step-number">4</span>
+        <span class="step-label">Location & Confirm</span>
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    <div class="loader-placeholder" *ngIf="isLoading()">
+      <div class="skeleton form-skeleton"></div>
+    </div>
+
+    <!-- Alert notifications -->
+    <div class="alert alert-error" *ngIf="errorMessage()">
+      <span>⚠️ {{ errorMessage() }}</span>
+    </div>
+    <div class="alert alert-success" *ngIf="successMessage()">
+      <span>✅ {{ successMessage() }}</span>
+    </div>
+
+    <!-- Multi-step Form -->
+    <form *ngIf="!isLoading() && listingForm" [formGroup]="listingForm" (ngSubmit)="onSubmit()" class="listing-form">
+      
+      <!-- STEP 1: Basic Information -->
+      <div class="step-content fade-upward" *ngIf="currentStep() === 1">
+        <fieldset class="form-section">
+          <legend>Step 1: General Property Info</legend>
+
+          <div class="form-group">
+            <label for="title">Listing Title</label>
+            <input id="title" type="text" formControlName="title" class="form-control" placeholder="e.g. Premium Single Room in Indiranagar 2nd Stage" />
+            <span class="error-msg" *ngIf="listingForm.get('title')?.touched && listingForm.get('title')?.errors?.['required']">
+              Title is required.
+            </span>
+            <span class="error-msg" *ngIf="listingForm.get('title')?.touched && listingForm.get('title')?.errors?.['maxlength']">
+              Title cannot exceed 100 characters.
+            </span>
+          </div>
+
+          <div class="row-grid">
+            <div class="form-group">
+              <label for="propertyType">Stay Category</label>
+              <select id="propertyType" formControlName="propertyType" class="form-control">
+                <option *ngFor="let type of propertyTypes" [value]="type">{{ type }}</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="furnishing">Furnishing status</label>
+              <select id="furnishing" formControlName="furnishing" class="form-control">
+                <option *ngFor="let item of furnishingTypes" [value]="item" class="text-capitalize">{{ item }}</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="description">Detailed Description</label>
+            <textarea id="description" formControlName="description" class="form-control text-area" rows="5" placeholder="Mention near landmarks, house rules, water timings, curfew details etc..."></textarea>
+            <span class="error-msg" *ngIf="listingForm.get('description')?.touched && listingForm.get('description')?.errors?.['required']">
+              Description is required.
+            </span>
+          </div>
+        </fieldset>
+      </div>
+
+      <!-- STEP 2: Pricing & Preferences -->
+      <div class="step-content fade-upward" *ngIf="currentStep() === 2">
+        <fieldset class="form-section">
+          <legend>Step 2: Rates & Room Preference</legend>
+
+          <div class="row-grid">
+            <div class="form-group">
+              <label for="rent">Monthly Rent Cost (₹)</label>
+              <input id="rent" type="number" formControlName="rent" class="form-control" placeholder="e.g. 12000" />
+              <span class="error-msg" *ngIf="listingForm.get('rent')?.touched && listingForm.get('rent')?.errors?.['required']">
+                Monthly rent is required.
+              </span>
+            </div>
+
+            <div class="form-group">
+              <label for="deposit">Security Deposit (₹)</label>
+              <input id="deposit" type="number" formControlName="deposit" class="form-control" placeholder="e.g. 30000" />
+              <span class="error-msg" *ngIf="listingForm.get('deposit')?.touched && listingForm.get('deposit')?.errors?.['required']">
+                Security deposit is required.
+              </span>
+            </div>
+          </div>
+
+          <div class="row-grid">
+            <div class="form-group">
+              <label for="genderPreference">Gender Preference</label>
+              <select id="genderPreference" formControlName="genderPreference" class="form-control">
+                <option *ngFor="let item of genderPreferences" [value]="item" class="text-capitalize">{{ item }} preferred</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="roomSharingType">Room Sharing Type</label>
+              <select id="roomSharingType" formControlName="roomSharingType" class="form-control">
+                <option *ngFor="let item of sharingTypes" [value]="item" class="text-capitalize">{{ item }}</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="status">Property Occupancy</label>
+              <select id="status" formControlName="status" class="form-control">
+                <option value="available">Available (Publicly listed)</option>
+                <option value="unavailable">Unavailable (Hide listing)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group check-inline">
+            <label class="checkbox-container">
+              <input type="checkbox" formControlName="foodAvailability" />
+              <span>Food Provided (Included in rent)</span>
+            </label>
+          </div>
+        </fieldset>
+      </div>
+
+      <!-- STEP 3: Amenities & Media -->
+      <div class="step-content fade-upward" *ngIf="currentStep() === 3">
+        <fieldset class="form-section">
+          <legend>Step 3: Amenities & Media Gallery</legend>
+
+          <div class="form-group">
+            <label for="imagesText">Property Image URLs (comma-separated)</label>
+            <input id="imagesText" type="text" formControlName="imagesText" class="form-control" placeholder="e.g. https://domain.com/photo1.jpg, https://domain.com/photo2.jpg" />
+            <span class="meta-note">Provide direct image URLs representing the stay rooms.</span>
+          </div>
+
+          <div class="form-group">
+            <label for="videoUrl">Walk-through Video URL (YouTube, optional)</label>
+            <input id="videoUrl" type="url" formControlName="videoUrl" class="form-control" placeholder="e.g. https://youtube.com/watch?v=..." />
+          </div>
+
+          <div class="form-group">
+            <label>Check Amenities Provided</label>
+            <div class="amenities-checklist">
+              <label *ngFor="let am of amenitiesList" class="checklist-item">
+                <input type="checkbox" [checked]="selectedAmenities.includes(am)" (change)="toggleAmenity(am)" />
+                <span>{{ am }}</span>
+              </label>
+            </div>
+          </div>
+        </fieldset>
+      </div>
+
+      <!-- STEP 4: Location, Contacts & Confirm -->
+      <div class="step-content fade-upward" *ngIf="currentStep() === 4">
+        <fieldset class="form-section">
+          <legend>Step 4: Location & Landlord Contact</legend>
+
+          <div class="row-grid">
+            <div class="form-group">
+              <label for="city">City</label>
+              <input id="city" type="text" formControlName="city" class="form-control" placeholder="e.g. Bangalore" />
+              <span class="error-msg" *ngIf="listingForm.get('city')?.touched && listingForm.get('city')?.errors?.['required']">
+                City is required.
+              </span>
+            </div>
+
+            <div class="form-group">
+              <label for="locality">Locality</label>
+              <input id="locality" type="text" formControlName="locality" class="form-control" placeholder="e.g. Indiranagar" />
+              <span class="error-msg" *ngIf="listingForm.get('locality')?.touched && listingForm.get('locality')?.errors?.['required']">
+                Locality is required.
+              </span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="address">Full Street Address</label>
+            <input id="address" type="text" formControlName="address" class="form-control" placeholder="Flat / House number, Lane name..." />
+            <span class="error-msg" *ngIf="listingForm.get('address')?.touched && listingForm.get('address')?.errors?.['required']">
+              Address is required.
+            </span>
+          </div>
+
+          <!-- Coordinates Panel -->
+          <div class="coordinates-panel">
+            <div class="row-grid">
+              <div class="form-group">
+                <label for="latitude">Latitude</label>
+                <input id="latitude" type="text" formControlName="latitude" class="form-control" placeholder="e.g. 12.9352" />
+                <span class="error-msg" *ngIf="listingForm.get('latitude')?.touched && listingForm.get('latitude')?.errors?.['required']">
+                  Latitude is required.
+                </span>
+              </div>
+              <div class="form-group">
+                <label for="longitude">Longitude</label>
+                <input id="longitude" type="text" formControlName="longitude" class="form-control" placeholder="e.g. 77.6245" />
+                <span class="error-msg" *ngIf="listingForm.get('longitude')?.touched && listingForm.get('longitude')?.errors?.['required']">
+                  Longitude is required.
+                </span>
+              </div>
+            </div>
+            <button type="button" (click)="autofillCoordinates()" class="btn btn-secondary btn-sm gps-autofill-btn">
+              📍 Grab My GPS Location Coordinates
+            </button>
+          </div>
+
+          <!-- Availability & Contact Details -->
+          <div class="row-grid">
+            <div class="form-group">
+              <label for="availableFrom">Available From Date</label>
+              <input id="availableFrom" type="date" formControlName="availableFrom" class="form-control" />
+              <span class="error-msg" *ngIf="listingForm.get('availableFrom')?.touched && listingForm.get('availableFrom')?.errors?.['required']">
+                Date is required.
+              </span>
+            </div>
+
+            <div class="form-group">
+              <label for="contactName">Owner / Landlord Name</label>
+              <input id="contactName" type="text" formControlName="contactName" class="form-control" placeholder="e.g. Rajesh Kumar" />
+              <span class="error-msg" *ngIf="listingForm.get('contactName')?.touched && listingForm.get('contactName')?.errors?.['required']">
+                Contact name is required.
+              </span>
+            </div>
+
+            <div class="form-group">
+              <label for="contactPhone">Contact Phone Number</label>
+              <input id="contactPhone" type="tel" formControlName="contactPhone" class="form-control" placeholder="e.g. 9876543210" />
+              <span class="error-msg" *ngIf="listingForm.get('contactPhone')?.touched && listingForm.get('contactPhone')?.errors?.['required']">
+                Phone is required.
+              </span>
+            </div>
+          </div>
+        </fieldset>
+
+        <!-- Final Step Review Panel before Submitting -->
+        <div class="wizard-review-panel glass-card">
+          <h4>🔎 Review Listing Changes</h4>
+          <ul class="review-details-list">
+            <li><strong>Title:</strong> {{ listingForm.value.title || 'N/A' }}</li>
+            <li><strong>Rent:</strong> ₹{{ listingForm.value.rent || '0' }}/mo (Deposit: ₹{{ listingForm.value.deposit || '0' }})</li>
+            <li><strong>Locality:</strong> {{ listingForm.value.locality }}, {{ listingForm.value.city }}</li>
+            <li><strong>Coordinates:</strong> [{{ listingForm.value.latitude }}, {{ listingForm.value.longitude }}]</li>
+            <li><strong>Landlord:</strong> {{ listingForm.value.contactName }} ({{ listingForm.value.contactPhone }})</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Stepper Controls Footer -->
+      <div class="stepper-controls-footer">
+        <button type="button" (click)="prevStep()" class="btn btn-secondary btn-prev" *ngIf="currentStep() > 1">
+          ◀ Back
+        </button>
+        <a routerLink="/dashboard" class="btn btn-secondary" *ngIf="currentStep() === 1">Cancel</a>
+
+        <button type="button" (click)="nextStep()" class="btn btn-primary btn-next" *ngIf="currentStep() < 4">
+          Next Step ▶
+        </button>
+
+        <button type="submit" class="btn btn-primary btn-submit" [disabled]="isSaving() || listingForm.invalid" *ngIf="currentStep() === 4">
+          <span *ngIf="!isSaving()">Save Changes 🚀</span>
+          <span *ngIf="isSaving()">Saving Changes...</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

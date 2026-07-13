@@ -1,0 +1,126 @@
+.profile-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 72px - 340px);
+  padding: 40px 24px;
+  background: linear-gradient(135deg, rgba(217, 119, 6, 0.05), rgba(255, 107, 107, 0.05));
+}
+
+.profile-card {
+  max-width: 500px;
+  width: 100%;
+  padding: 40px;
+  text-align: center;
+  background-color: white !important;
+  border-radius: var(--border-radius-md);
+  
+  &:hover {
+    transform: none;
+  }
+}
+
+.profile-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 30px;
+  
+  .avatar-big {
+    font-size: 4rem;
+    background-color: rgba(0, 0, 0, 0.04);
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 16px;
+    border: 2px solid white;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  }
+  
+  h1 {
+    font-size: 1.6rem;
+    color: var(--text-dark);
+    margin-bottom: 6px;
+  }
+  
+  .role-badge {
+    font-family: var(--font-display);
+    font-size: 0.8rem;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: 20px;
+    
+    &.owner {
+      background-color: var(--primary-light);
+      color: var(--primary-hover);
+    }
+    
+    &.seeker {
+      background-color: #eff6ff;
+      color: #1d4ed8;
+    }
+  }
+}
+
+.profile-info-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  padding: 24px 0;
+  margin-bottom: 24px;
+  
+  .info-item {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9rem;
+    
+    .label {
+      color: var(--text-muted);
+    }
+    
+    .val {
+      font-weight: 600;
+      color: var(--text-dark);
+    }
+  }
+}
+
+.stats-panel {
+  margin-bottom: 30px;
+}
+
+.stat-widget {
+  background-color: var(--light-bg);
+  padding: 16px;
+  border-radius: var(--border-radius-sm);
+  display: flex;
+  flex-direction: column;
+  
+  .stat-count {
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: var(--primary);
+    line-height: 1.1;
+  }
+  
+  .stat-label {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    font-weight: 500;
+  }
+}
+
+.profile-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  
+  .btn {
+    width: 100%;
+  }
+}

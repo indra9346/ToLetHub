@@ -1,0 +1,218 @@
+<div class="home-page fade-upward">
+  <!-- Cinematic Hero Section -->
+  <section class="hero-section">
+    <!-- Looping background video with dark overlays -->
+    <div class="video-container" aria-hidden="true">
+      <video #bgVideo autoplay muted loop playsinline preload="metadata" class="hero-video">
+        <source src="assets/videos/hero-bg-1.mp4" type="video/mp4" />
+      </video>
+      <div class="gradient-overlay"></div>
+      <div class="grain-overlay"></div>
+      <div class="particles-overlay">
+        <div class="particle p-1"></div>
+        <div class="particle p-2"></div>
+        <div class="particle p-3"></div>
+      </div>
+    </div>
+    
+    <div class="hero-content">
+      <!-- Branded Logo Mark Element -->
+      <div class="hero-brand-logo">
+        <img src="assets/branding/tolethub-logo-mark.png" alt="" class="logo-mark" />
+        <span class="trust-badge">Smart Rental Discovery</span>
+      </div>
+
+      <h1 class="hero-title">
+        Your next home, <br />
+        <span class="highlight-text animate-text-glow">discovered intelligently.</span>
+      </h1>
+      
+      <p class="hero-subtitle">
+        Discover verified PGs, rooms, and houses in India without local broker charges or door-to-door stress.
+      </p>
+      
+      <!-- Premium Integrated Search Bar -->
+      <div class="premium-search-bar glass-card">
+        <div class="search-field">
+          <label for="searchLocality">Locality</label>
+          <input #locInput id="searchLocality" type="text" placeholder="e.g. Koramangala, Indiranagar" class="search-input" />
+        </div>
+        <div class="search-field">
+          <label for="searchType">Property Type</label>
+          <select #typeSel id="searchType" class="search-select">
+            <option value="">Any Type</option>
+            <option value="PG">Paying Guest (PG)</option>
+            <option value="Room">Single Room</option>
+            <option value="House">Full House</option>
+          </select>
+        </div>
+        <div class="search-field">
+          <label for="searchBudget">Max Budget</label>
+          <select #budgetSel id="searchBudget" class="search-select">
+            <option value="">Any Budget</option>
+            <option value="8000">Under ₹8,000</option>
+            <option value="12000">Under ₹12,000</option>
+            <option value="18000">Under ₹18,000</option>
+            <option value="25000">Under ₹25,000</option>
+            <option value="40000">Under ₹40,000</option>
+          </select>
+        </div>
+        <button (click)="searchStays(locInput.value, typeSel.value, budgetSel.value)" class="btn btn-primary search-action-btn">
+          🔍 Search
+        </button>
+      </div>
+
+      <!-- Quick Category Selection Cards -->
+      <div class="category-shortcuts-row">
+        <button (click)="quickSearch('PG')" class="cat-btn glass-card">
+          <span class="icon">🏢</span>
+          <div class="text">
+            <h4>Paying Guest (PG)</h4>
+            <p>Co-living beds & food</p>
+          </div>
+        </button>
+        <button (click)="quickSearch('Room')" class="cat-btn glass-card">
+          <span class="icon">🛏️</span>
+          <div class="text">
+            <h4>Single Room</h4>
+            <p>Subletting & Flatmates</p>
+          </div>
+        </button>
+        <button (click)="quickSearch('House')" class="cat-btn glass-card">
+          <span class="icon">🏡</span>
+          <div class="text">
+            <h4>Full House</h4>
+            <p>Independent Homes</p>
+          </div>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Metrics Strip Dashboard -->
+  <section class="metrics-strip-section">
+    <div class="metrics-container glass-card">
+      <div class="metric-item">
+        <span class="count">1,200+</span>
+        <span class="label">Verified Properties</span>
+      </div>
+      <div class="metric-item border-left">
+        <span class="count">450+</span>
+        <span class="label">Registered Owners</span>
+      </div>
+      <div class="metric-item border-left">
+        <span class="count">3,800+</span>
+        <span class="label">Seekers Helped</span>
+      </div>
+      <div class="metric-item border-left highlight">
+        <span class="count">₹0</span>
+        <span class="label">Brokerage Fees</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Visual Path Sequence: How it works -->
+  <section class="how-it-works-section">
+    <div class="section-container">
+      <div class="section-header">
+        <span class="section-tag">Simplified Process</span>
+        <h2>How ToLetHub Works</h2>
+        <p>Three simple steps to secure your next comfortable stay.</p>
+      </div>
+
+      <div class="path-grid">
+        <div class="path-step">
+          <div class="step-num">1</div>
+          <h3>Search Stays</h3>
+          <p>Filter by location, budgets, amenities, and view properties on our interactive spatial map.</p>
+        </div>
+        <div class="path-arrow" aria-hidden="true">➔</div>
+        <div class="path-step">
+          <div class="step-num">2</div>
+          <h3>Compare Options</h3>
+          <p>Add potential listings to your wishlist comparison matrix and evaluate features side-by-side.</p>
+        </div>
+        <div class="path-arrow" aria-hidden="true">➔</div>
+        <div class="path-step">
+          <div class="step-num">3</div>
+          <h3>Move In</h3>
+          <p>Get directions, contact the property owner directly, and finalize terms. Zero brokerage fees.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured Listings Row -->
+  <section class="featured-listings-section">
+    <div class="section-container">
+      <div class="section-header-row">
+        <div>
+          <span class="section-tag">Curated Stays</span>
+          <h2>Featured Properties</h2>
+        </div>
+        <a routerLink="/explore" class="btn btn-secondary">Explore All ➔</a>
+      </div>
+
+      <!-- Loading skeleton states -->
+      <div class="listings-grid" *ngIf="isLoading()">
+        <div class="listing-skeleton glass-card" *ngFor="let item of [1, 2, 3]">
+          <div class="skeleton img-skeleton"></div>
+          <div class="skeleton title-skeleton"></div>
+          <div class="skeleton text-skeleton"></div>
+        </div>
+      </div>
+
+      <!-- Empty state -->
+      <div class="empty-state glass-card" *ngIf="!isLoading() && popularListings().length === 0">
+        <span class="empty-icon">🏠</span>
+        <h3>No rentals available yet</h3>
+        <p>We are currently setting up properties. Please check back shortly or register as an owner to list yours!</p>
+      </div>
+
+      <!-- Property Grid -->
+      <div class="listings-grid" *ngIf="!isLoading() && popularListings().length > 0">
+        <div class="listing-card glass-card" *ngFor="let list of popularListings()">
+          <div class="image-wrapper zoom-wrapper" [routerLink]="['/explore/details', list._id]">
+            <img [src]="list.images && list.images[0] ? list.images[0] : 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=800&q=80'" alt="{{ list.title }}" class="property-img" />
+            <span class="badge property-type">{{ list.propertyType }}</span>
+            <button class="fav-btn" [class.favorited]="isFavorite(list._id || '')" (click)="toggleFavorite($event, list._id || '')" aria-label="Add to Favorites">
+              ♥
+            </button>
+          </div>
+          <div class="card-body">
+            <h3 class="card-title" [routerLink]="['/explore/details', list._id]">{{ list.title }}</h3>
+            <p class="locality">📍 {{ list.locality }}, {{ list.city }}</p>
+            <div class="meta-row">
+              <span class="furnishing-status text-capitalize">{{ list.furnishing }}</span>
+              <span class="gender-preference text-capitalize" [class]="list.genderPreference">{{ list.genderPreference }} preferred</span>
+            </div>
+            <div class="footer-price-row">
+              <div class="price-container">
+                <span class="rent">₹{{ list.rent | number }}/mo</span>
+                <span class="deposit">Deposit: ₹{{ list.deposit | number }}</span>
+              </div>
+              <a [routerLink]="['/explore/details', list._id]" class="btn-arrow" aria-label="View listing details">➔</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Landlord Conversion CTA Section -->
+  <section class="owner-conversion-section">
+    <div class="conversion-container glass-card">
+      <div class="conversion-content">
+        <span class="tag">Are you a Landlord?</span>
+        <h2>Earn from your PG, Room, or House</h2>
+        <p>List your rental listing on ToLetHub and reach thousands of verified students, flatmates, and families directly.</p>
+        <div class="cta-group">
+          <button (click)="quickCreate('PG')" class="btn btn-primary">List My PG</button>
+          <button (click)="quickCreate('Room')" class="btn btn-secondary">List My Room</button>
+          <button (click)="quickCreate('House')" class="btn btn-secondary">List My House</button>
+        </div>
+      </div>
+      <div class="conversion-image" aria-hidden="true">🔑</div>
+    </div>
+  </section>
+</div>
