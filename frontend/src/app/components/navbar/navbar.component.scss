@@ -376,7 +376,9 @@
   top: 0;
   right: 0;
   width: 300px;
-  height: 100vh;
+  height: 100dvh;
+  max-height: 100dvh;
+  overflow-y: auto;
   background-color: #0c1220; /* Dark Charcoal drawer background */
   z-index: 1060;
   padding: 30px 24px;
@@ -400,7 +402,11 @@
       width: 32px;
       height: 32px;
     }
-    .tolet { color: white; }
+    
+    .brand-text {
+      .tolet { color: white; }
+      .hub { color: var(--primary); }
+    }
     
     .btn-close-drawer {
       background: transparent;

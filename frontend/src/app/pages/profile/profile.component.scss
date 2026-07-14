@@ -124,3 +124,9 @@
     width: 100%;
   }
 }
+
+@media (max-width: 576px) {
+  .profile-card {
+    padding: 24px 20px !important;
+  }
+}

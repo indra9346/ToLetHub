@@ -141,7 +141,7 @@
     </aside>
 
     <!-- Main Results Column -->
-    <main class="results-container">
+    <main class="results-container" [class.mobile-hidden]="showMapView()">
       <!-- Listings Header: Sort + Count -->
       <div class="results-header glass-card">
         <div class="count-meta">
@@ -230,11 +230,17 @@
     </main>
 
     <!-- Map Column -->
-    <section class="map-column-section glass-card">
+    <section class="map-column-section glass-card" [class.mobile-visible]="showMapView()">
       <div id="explore-map" class="map-frame"></div>
       <div class="map-overlay-badge">
         Interactive Map view
       </div>
     </section>
   </div>
+
+  <!-- Mobile View Toggle Button (Floating) -->
+  <button class="mobile-view-toggle-btn" (click)="showMapView.set(!showMapView())">
+    <span *ngIf="!showMapView()">🌐 Show Map</span>
+    <span *ngIf="showMapView()">📋 Show List</span>
+  </button>
 </div>

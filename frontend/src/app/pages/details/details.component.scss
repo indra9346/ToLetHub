@@ -624,7 +624,7 @@
   .mobile-action-bar {
     display: flex;
   }
-  .sidebar-column .contact-card {
-    display: none; /* hidden on mobile, replaced by sticky bar */
+  ::ng-deep .chat-trigger-btn {
+    bottom: 88px !important; /* shift chatbot button above sticky call bar */
   }
 }

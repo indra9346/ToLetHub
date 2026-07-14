@@ -295,3 +295,34 @@
     color: #15803d;
   }
 }
+
+@media (max-width: 576px) {
+  .create-page {
+    padding: 80px 12px 20px 12px;
+  }
+  .create-container {
+    padding: 20px 16px !important;
+    gap: 20px;
+  }
+  .form-header h1 {
+    font-size: 1.5rem;
+  }
+  .form-stepper {
+    margin: 5px 0;
+  }
+  .coordinates-panel {
+    padding: 12px;
+    .gps-autofill-btn {
+      width: 100%;
+      text-align: center;
+    }
+  }
+  .stepper-controls-footer {
+    flex-wrap: wrap;
+    gap: 10px;
+    button, a {
+      width: 100%;
+      text-align: center;
+    }
+  }
+}

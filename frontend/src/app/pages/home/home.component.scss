@@ -14,6 +14,12 @@
   justify-content: center;
   padding: 80px 24px;
   overflow: hidden;
+
+  @media (max-width: 768px) {
+    height: auto;
+    min-height: auto;
+    padding: 110px 16px 60px 16px;
+  }
 }
 
 .video-container {

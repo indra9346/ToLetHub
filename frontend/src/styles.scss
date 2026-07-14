@@ -289,3 +289,7 @@ a {
   border-radius: var(--border-radius-sm) !important;
   font-family: var(--font-body) !important;
 }
+
+.main-content {
+  min-height: calc(100vh - 72px - 280px); /* ensure it spans at least full viewport height minus header/footer */
+}

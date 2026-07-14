@@ -254,3 +254,25 @@
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
+
+@media (max-width: 480px) {
+  .auth-page {
+    padding: 80px 12px 40px 12px;
+  }
+  .auth-container {
+    padding: 24px 20px !important;
+    gap: 16px;
+  }
+  .role-selector {
+    gap: 10px;
+    .role-card {
+      padding: 12px 8px;
+      .icon {
+        font-size: 1.25rem;
+      }
+      span:last-child {
+        font-size: 0.7rem;
+      }
+    }
+  }
+}

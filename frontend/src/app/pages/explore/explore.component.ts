@@ -26,8 +26,9 @@ export class ExploreComponent implements OnInit, OnDestroy {
 
   listings = signal<Listing[]>([]);
   isLoading = signal<boolean>(true);
-  hoveredListingId = signal<string | null>(null);
+  showMapView = signal<boolean>(false);
   isMobileFilterOpen = signal<boolean>(false);
+  hoveredListingId = signal<string | null>(null);
   
   // Map parameters
   private map: L.Map | null = null;
@@ -221,10 +222,22 @@ export class ExploreComponent implements OnInit, OnDestroy {
                 <p style="margin-bottom: 6px; font-size: 0.8rem; color: #64748b;">📍 ${list.locality}</p>
                 <div style="display: flex; justify-content: space-between; align-items: center;">
                   <span style="font-weight: 800; color: #d97706;">₹${list.rent.toLocaleString()}/mo</span>
-                  <a href="/explore/details/${list._id}" style="color: #d97706; font-size: 0.8rem; font-weight: 600; text-decoration: none;">View Detail</a>
+                  <a href="/explore/details/${list._id}" class="popup-detail-link" style="color: #d97706; font-size: 0.8rem; font-weight: 600; text-decoration: none;">View Detail</a>
                 </div>
               </div>
             `);
+          
+          marker.on('popupopen', () => {
+            setTimeout(() => {
+              const link = document.querySelector(`.leaflet-popup-content a.popup-detail-link[href="/explore/details/${list._id}"]`);
+              if (link) {
+                link.addEventListener('click', (e: Event) => {
+                  e.preventDefault();
+                  this.router.navigate(['/explore/details', list._id]);
+                });
+              }
+            }, 50);
+          });
           
           if (list._id) {
             this.markersMap.set(list._id, marker);

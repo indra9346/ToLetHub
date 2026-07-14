@@ -15,7 +15,10 @@
         <span class="badge">AI Assistant</span>
       </div>
     </div>
-    <button class="btn-clear" (click)="clearConversation()" title="Clear Conversation">🧹</button>
+    <div class="header-actions">
+      <button class="btn-clear" (click)="clearConversation()" title="Clear Conversation">🧹</button>
+      <button class="btn-close-chat" (click)="isOpen.set(false)" title="Close Chat">✕</button>
+    </div>
   </div>
 
   <!-- Messages scroll area -->
